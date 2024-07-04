@@ -1,0 +1,121 @@
+<apex:page id="page" controller="bPartner_HomePageController" lightningStylesheets="false" standardStylesheets="false" showHeader="false" sidebar="false">
+    <apex:form >
+        <style>
+            .navbar-expand-md .navbar-nav{
+            align-items: center;
+            }
+            .oneAlohaPageDeprecated.content {
+            height: 100% !important; 
+            }
+        </style>
+        <!-- <!doctype html> -->
+        <html lang="en">
+            <head>
+                <title>Bizcap Header</title><!-- Bootstrap core CSS -->
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <meta name="generator" content="" />
+                
+                <!-- Custom styles for this template -->
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+                <!--font-family: 'Montserrat', sans-serif;-->
+                
+                
+                <!--<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/jquery.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/bootstrap.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/chartjs.init.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/Chart.min.js')}"/>-->
+                
+                <script src="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/jquery.min.js')}"></script>
+                <script src="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/bootstrap.min.js')}"></script>
+                <script src="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"></script>
+                <script>window.jQuery || document.write('<script src="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/vendor/jquery.slim.min.js')}"</script>
+                <script src= "{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/chartjs.init.js')}"></script>
+                <script src= "{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/Chart.min.js')}"></script>
+                
+            </head>
+            
+            <body id="top-body">
+                <header class="navbar-dark fixed-top">
+                    <div class="mian-header">
+                        <div class="container">
+                            <div class="row ">
+                                <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                    <div class="navbar-brand">
+                                        <a class="" href="{!$Label.bPartner_HomeURL}" target="_top">
+                                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/logo.png')}"/>
+                                            <!--<img src="dist/images/logo.png" />-->
+                                        </a>
+                                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="collapse navbar-collapse ml-auto" id="navbarCollapse">
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item ">
+                                                <a class="nav-link" href="{!$Label.bPartner_HomeURL}" target="_top">Home</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_DealsURL}" target="_top">Deals</a>
+                                                <!--<a class="nav-link" href="about.html">Deals</a>-->
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_ResourceURL}" target="_top">Resources</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <apex:outputText styleClass="fa fa-phone" />
+                                                <span>1300 922 233</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="haedrcntnumber  ml-auto">
+                                        <ul>
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-user" aria-hidden="true"></i> 
+                                                    <span>{!currentuser.Name}</span>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    <!--<apex:commandLink Styleclass="dropdown-item" value="Dashboard"/>-->
+                                                    <a class="dropdown-item" href="{!$Label.bPartner_ProfileURL}{!currentuser.Id}" target="_top">My Profile</a>
+                                                    <a class="dropdown-item">
+                                                        <!--<input type="button" onClick="parent.location='{!logOutURL}'" value="Logout" formtarget="_parent" />-->
+                                                        <apex:outputLabel id="label" onclick="parent.location='{!$Label.bPartner_ProfilePage_Logout}'"> Logout </apex:outputLabel> </a>
+                                                    <!--<apex:actionfunction action="{!loginOut}" name="TestAF" rerender="page" >
+</apex:actionfunction>-->
+                                                    <!--<a class="dropdown-item" href="{!$Label.bPartner_LogOutURL}" target="_top"> Logout </a>-->
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                
+            </body> 
+            <script>
+            function logoutuser()
+            {
+                console.log('logoutuser called');
+                TestAF();
+                //var lout = '$A.get($Label.c.bPartner_LogOutURL)';
+                //window.location.replace("{!$Site.Prefix}/secur/logout.jsp?retUrl=lout");
+                // window.location.reload();
+            }
+            </script>
+        </html>
+    </apex:form>
+</apex:page>

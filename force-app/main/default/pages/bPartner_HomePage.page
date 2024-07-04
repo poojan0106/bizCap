@@ -1,0 +1,1322 @@
+<apex:page controller="bPartner_HomePageController" lightningStylesheets="false" standardStylesheets="false" cache="false" showHeader="false" sidebar="false">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        
+        
+        <script language="JavaScript">
+            
+            $(function() {
+                
+                $('input[name="datefilter"]').daterangepicker({
+                    autoUpdateInput: false,
+                    locale: {
+                        cancelLabel: 'Clear'
+                    }
+                });
+                
+                $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+                    console.log(picker.startDate.format('DD/MM/YYYY'));
+                    console.log(picker.endDate.format('DD/MM/YYYY'));
+                    checkDates(picker.startDate.format('YYYY-MM-DD'),picker.endDate.format('YYYY-MM-DD'));
+                });
+                
+                $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+                    $(this).val('');
+                });
+                
+            });    
+    
+    </script>   
+    <apex:form >
+        <style>
+            
+            viewer-pdf-toolbar {
+            display: none !important;
+            }
+            
+            .navbar-expand-md .navbar-nav{
+            align-items: center;
+            }
+            
+            .analyticsEmbeddedReportChart .lightning .refreshButton {
+            color: rgb(84, 105, 141);
+            border: 1px solid transparent;
+            line-height: 1.6;
+            margin-top: -90px;
+            height: 30px;
+            width: 70px;
+            align-self: center;
+            overflow: hidden;
+            margin-right: -80px;
+            display: block;
+            padding: 4px;
+            }
+            
+            .analyticsEmbeddedReportChart .lightning .refreshButton:hover {
+            color: white;
+            }
+            
+            .analyticsEmbeddedReportChart .lightning .asOfDate {
+            font-size: .75rem;
+            color: rgb(84, 105, 141);
+            font-style: normal;
+            font-weight: normal;
+            display: flex;
+            align-self: center;
+            margin-right: 8px;
+            visibility: hidden;
+            }
+            .analyticsEmbeddedReportChart .lightning .navigateButton {
+            float: left;
+            font-size: .75rem;
+            visibility: hidden;
+            }
+            
+            
+            svg {
+            overflow: hidden;
+            vertical-align: middle;
+            visibility: hidden;
+            }
+            .chart .chartContainer 
+            {
+            height: 150px !important;
+            width:200px!important;
+            }
+            
+            .reportTitle h2
+            {    
+            font-size: medium;
+            }
+            
+            .reportTitle h2
+            {    
+            font-size: medium;
+            }
+            
+            #tooltip
+            {
+            text-align: center;
+            color: #fff;
+            background: #111;
+            position: absolute;
+            z-index: 100;
+            padding: 15px;
+            font-size: 11px;
+            }
+            
+            #tooltip:after /* triangle decoration */
+            {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #111;
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -10px;
+            margin-left: -10px;
+            }
+            
+            #tooltip.top:after
+            {
+            border-top-color: transparent;
+            border-bottom: 10px solid #111;
+            top: -20px;
+            bottom: auto;
+            }
+            
+            #tooltip.left:after
+            {
+            left: 10px;
+            margin: 0;
+            }
+            
+            #tooltip.right:after
+            {
+            right: 10px;
+            left: auto;
+            margin: 0;
+            }
+            
+            
+            * {margin:0; padding:0;}
+            .conainer {width: 600px; font-family: 'Arial'}
+            .circle_percent {font-size:100px; width:1em; height:1em; position: relative; background: #fff; border-radius:50%; overflow:hidden; display:inline-block; margin:15px;}
+            
+            .circle_inner1{position: absolute;border: 1px solid #a7a5a5;height: 82px;width: 82px;border-radius: 50%;top: 7px;left: 7px;}
+            .circle_inner {position: absolute; left: 0; top: 0; width: 1em; height: 1em; clip:rect(0 1em 1em .5em);}
+            .round_per {position: absolute; left: 0; top: 0; width: 1em; height: 1em; background: cornflowerblue; clip:rect(0 1em 1em .5em); transform:rotate(180deg); transition:1.05s;}
+            .percent_more .circle_inner {clip:rect(0 .5em 1em 0em);}
+            .percent_more:after {position: absolute; left: .5em; top:0em; right: 0; bottom: 0; background: rgb(241 205 82); content:'';}
+            .circle_inbox {position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; background: #fff; z-index:3; border-radius: 50%;}
+            .percent_text {position: absolute; font-size: 20px; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 3;}
+            
+        </style>            
+        <html lang="en">
+            <head>
+                <title>Bizcap Home</title><!-- Bootstrap core CSS -->
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <meta name="generator" content="" />
+                
+                <!-- Custom styles for this template -->
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+                <!--font-family: 'Montserrat', sans-serif;-->
+                
+                
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/jquery.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/bootstrap.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/chartjs.init.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/Chart.min.js')}"/>
+                
+            </head>
+            <body id="top-body">
+                <apex:actionFunction name="pageredirect" action="{!redirect}"  rerender="none" > 
+                    <apex:param name="a" assignTo="{!enteredText1}" value="" />
+                </apex:actionFunction>
+                <apex:variable var="downdoc" value="{!$Label.bPartner_PdfDoc}"/>
+                <header class="navbar-dark fixed-top">
+                    <div class="mian-header">
+                        <div class="container">
+                            <div class="row ">
+                                <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                    <div class="navbar-brand">
+                                        <a class="" href="#">
+                                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/logo.png')}"/>
+                                            <!--<img src="dist/images/logo.png" />-->
+                                        </a>
+                                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="collapse navbar-collapse ml-auto" id="navbarCollapse">
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item ">
+                                                <a class="nav-link" href="{!$Label.bPartner_HomeURL}" target="_top">Home</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_DealsURL}" target="_top">Deals</a>
+                                                <!--<a class="nav-link" href="about.html">Deals</a>-->
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_ResourceURL}" target="_top">Resources</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <apex:outputText styleClass="fa fa-phone" />
+                                                <span>1300 922 233</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="haedrcntnumber  ml-auto">
+                                        <ul>
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-user" aria-hidden="true"></i> 
+                                                    <span>{!currentuser.Name}</span>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    <!--<apex:commandLink Styleclass="dropdown-item" value="Dashboard"/>-->
+                                                    <a class="dropdown-item" href="{!$Label.bPartner_ProfileURL}{!currentuser.Id}" target="_top">My Profile</a>
+                                                    <a class="dropdown-item"><apex:outputLabel onclick="logoutuser();"> Logout </apex:outputLabel> </a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <main role="main" class="main-part">
+                    <section class="banner-part page-section relative">
+                        <div class="banner-img">
+                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/home-header.jpg')}"/>
+                        </div>
+                        <div class="banner-text">
+                            <div class="banner-text-inner text-center text-white">
+                                <h1>Hi {!currentuser.Name}</h1>
+                                <p>Welcome to Bizcaps Partner Portal, here you can track leads,<br/>submissions and deals all in the one place.</p>
+                                <apex:outputLink value="{!$Label.bPartner_SubmitLead_URL}" target="_self" styleClass="btn btn-border">Submit a Lead</apex:outputLink>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section class="hmspansot page-section relative yourspanshot">
+                        <div class="container">
+                            <div class="row">
+                                <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                    <div class="top-nav-span col-sm-12">
+                                        <h2 class="section-title">Your Snapshot <i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" rel="tooltip"
+                                                                                   data-placement="top" title="Data in Snapshot is based on when the lead/opportunity was created based on the period. E.g. When looking at 'This Week', the Opportunities number is based off Opportunities created this week (irrespective of when the lead was created). An Opportunity is created when a customer requests a contract.">
+                                            </i></h2>
+                                        <nav>
+                                            <!--- New Tab Menu ---->
+                                            
+                                            
+                                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                                
+                                                <li class="nav-item">
+                                                    <a class="nav-link nav-item" id="nav-today-tab" data-toggle="tab" href="#today" role="tab" aria-controls="nav-today" aria-selected="false">Today</a>
+                                                </li>
+                                                <li class="nav-item">   
+                                                    <a class="nav-item nav-link active" id="nav-this-week-tab" data-toggle="tab" href="#this-week" role="tab" aria-controls="nav-this-week" aria-selected="false">This Week</a></li>
+                                                
+                                                <li class="nav-item">   
+                                                    <a class="nav-item nav-link" id="nav-last-week-tab" data-toggle="tab" href="#last-week" role="tab" aria-controls="nav-last-week" aria-selected="false">Last Week</a></li>
+                                                
+                                                <li class="nav-item">   
+                                                    <a class="nav-item nav-link" id="nav-this-month-tab" data-toggle="tab" href="#this-month" role="tab" aria-controls="nav-this-month" aria-selected="false">This Month</a></li>
+                                                
+                                                
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Choose your data range</a>
+                                                    <div class="dropdown-menu" style="">
+                                                        
+                                                        <a class="dropdown-item nav-item nav-link" id="nav-last-month-tab" data-toggle="tab" href="#last-month" role="tab" aria-controls="nav-last-month" aria-selected="true" aria-expanded="true">Last Month</a>
+                                                        <a class="dropdown-item nav-item nav-link" id="nav-this-year-tab" data-toggle="tab" href="#this-year" role="tab" aria-controls="nav-this-year" aria-selected="false">This Year</a>
+                                                        <a class="dropdown-item nav-item nav-link" id="nav-pick-date-tab" data-toggle="tab" href="#pick-date" role="tab" aria-controls="nav-pick-date" aria-selected="false">Pick Dates</a>
+                                                    </div>
+                                                </li>   
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </nav>
+                                
+                                <div class="tab-content" id="nav-tabContent">
+                                    
+                                    <!--Today Start-->
+                                    <div class="tab-pane fade" id="today" role="tabpanel" aria-labelledby="nav-today-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('todayLead');" >
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none"  onclick="thisweeklead('todayApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between" >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('todayOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('todaySets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('todaySets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Today End-->
+                                    
+                                    
+                                    <!-- this week Start-->
+                                    <div class="tab-pane fade show active" id="this-week" role="tabpanel" aria-labelledby="nav-this-week-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TWLead');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList1.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TWApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application1.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TWOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created1.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TWSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New1.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TWSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent1.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--this week End-->
+                                    
+                                    
+                                    
+                                    <!-- last week Start-->
+                                    <div class="tab-pane fade" id="last-week" role="tabpanel" aria-labelledby="nav-last-week-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LWLeads');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList2.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LWApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application2.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LWOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created2.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LWSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_new2.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LWSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent2.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--last week End-->
+                                    
+                                    
+                                    <!-- This Month Start-->
+                                    <div class="tab-pane fade" id="this-month" role="tabpanel" aria-labelledby="nav-this-month-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TMLeads');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList3.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TMApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application3.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TMOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created3.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TMSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New3.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TMSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent3.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--This Month End-->   
+                                    
+                                    <!-- Last Month Start-->
+                                    <div class="tab-pane fade" id="last-month" role="tabpanel" aria-labelledby="nav-last-month-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LMLeads');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList4.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LMApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application4.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LMOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created4.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LMSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New4.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('LMSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent4.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--This Month End-->
+                                    
+                                    
+                                    <!-- This Year Start-->
+                                    <div class="tab-pane fade" id="this-year" role="tabpanel" aria-labelledby="nav-this-year-tab">
+                                        <div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none"  onclick="thisweeklead('TYLeads');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList5.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TYApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application5.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TYOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created5.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TYSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New5.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('TYSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent5.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--This Year End-->
+                                    
+                                    <apex:actionFunction name="checkDates" action="{!checkBothDates}" reRender="custom">
+                                        <apex:param assignTo="{!pickStartDate}" value="" name="param"/>
+                                        <apex:param assignTo="{!pickEndDate}" value="" name="param1"/>
+                                    </apex:actionFunction>
+                                    
+                                    <!-- This Year Start-->
+                                    <div class="tab-pane fade" id="pick-date" role="tabpanel" aria-labelledby="nav-pick-date-tab">
+                                        <div class="note-record text-blue font-12 font-normal mb-2">
+                                            Pick Dates Here
+                                        </div>
+                                        <div class="table-section">
+                                            <input type="text" name="datefilter" value="" />
+                                        </div>
+                                        <apex:outputPanel id="custom">
+                                            <br /><div class="tab-inner">
+                                            <div class="row d-flex snapsotbox">
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('PDLeads');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Leads</p>
+                                                                    <h2>{!LeadList6.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon1.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('PDApp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Applications</p>
+                                                                    <h2>{!application6.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon2.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('PDOpp');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Opportunities Created</p>
+                                                                    <h2>{!opp_created6.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon3.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('PDSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>New<br /> Settlements</p>
+                                                                    <h2>{!setteled_New6.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon4.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                                
+                                                <div class="five-col">
+                                                    <apex:commandLink reRender="none" onclick="thisweeklead('PDSets');">
+                                                        <div class="card">
+                                                            <div class="d-flex card-inner justify-content-between " >
+                                                                <div class="box-content">
+                                                                    <p>Repeat Settlements</p>
+                                                                    <h2>{!settled_subsequent6.size}</h2>
+                                                                </div>
+                                                                <div class="box-icon">
+                                                                    <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/snapshot-icon5.png')}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </apex:commandLink>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </div>
+                                    <!--This Month End-->
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!--Your Snapshot End-->
+                    
+                    <!--Recent Opportunities Start-->
+                    <apex:outputPanel id="AllOpp" >
+                        <section class="hmspansot page-section relative yourspanshot">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <apex:outputPanel id="myPanelSAO"> 
+                                            <div class="card border-light">
+                                                <div class="card-body">
+                                                    <h2 class="section-title">Recent Opportunity Activity <i class="fa fa-exclamation-circle" aria-hidden="true" rel="tooltip" data-toggle="tooltip" data-placement="top" title="Recent Opportunity Activity"></i></h2>
+                                                    <div class="table-section">
+                                                        
+                                                        <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="col"></th>
+                                                                        <th scope="col">Date Created</th>
+                                                                        <th scope="col">Company</th>
+                                                                        <th scope="col">Opportunity Name</th>
+                                                                        <th scope="col">Stage</th>
+                                                                        <th scope="col">Sub Stage</th>
+                                                                        <th scope="col">Loan Amount</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                
+                                                                <tbody>
+                                                                    <apex:repeat value="{!RecentOpp}" var="op">
+                                                                        <tr>
+                                                                            <th scope="row">
+                                                                                <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/office-blue-icon.png')}"/>
+                                                                            </th>
+                                                                            <td>
+                                                                                <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                    <apex:param value="{!op.createdDate}" /> 
+                                                                                </apex:outputText>
+                                                                            </td>
+                                                                            <td>{!op.Company__c}</td>
+                                                                            <td>{!op.Name} </td>
+                                                                            <td>{!op.StageName}</td>
+                                                                            <td>{!op.Sub_stage__c}</td>
+                                                                            <td><apex:outputPanel rendered="{!op.Loan_Amount__c!=null}">
+                                                                                ${!FLOOR(op.Loan_Amount__c)}
+                                                                                </apex:outputPanel>
+                                                                                <apex:outputPanel rendered="{!op.Loan_Amount__c==null}">
+                                                                                    $0
+                                                                                </apex:outputPanel></td>
+                                                                        </tr>
+                                                                    </apex:repeat>
+                                                                </tbody>
+                                                            </table>
+                                                        </nav>
+                                                        <apex:pageBlock rendered="{!Showpagination}">
+                                                            <apex:commandButton value="First Page" rerender="myPanelSAO" action="{!SAOFirstPage}" disabled="{!SAOprev}"/>                
+                                                            <apex:commandButton value="Previous" rerender="myPanelSAO" action="{!SAOprevious}" disabled="{!SAOprev}"/>                
+                                                            <apex:commandButton value="Next" rerender="myPanelSAO" action="{!SAOnext}" disabled="{!SAOnxt}"/>                
+                                                            <apex:commandButton value="Last Page" rerender="myPanelSAO" action="{!SAOLastPage}" disabled="{!SAOnxt}"/>
+                                                        </apex:pageBlock>
+                                                        
+                                                        <apex:pageBlock rendered="{!ShowpageBlockFlag}">
+                                                            <div class="tble-btn text-center mt-3 mb-3">
+                                                                <apex:commandButton StyleClass="btn btn-border" action="{!seeAllOpp}" value="See All Opportunities" reRender="AllOpp"/>
+                                                            </div>
+                                                        </apex:pageBlock>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </section>
+                    </apex:outputPanel>
+                    
+                    
+                    <!--Recent Opportunities End-->
+                    <!--Recent Opportunities Start-->
+                    <section class=" page-section relative chart-sec">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="card border-light">
+                                        <div class="card-body" style="height: 375px;">
+                                            <h2 class="section-title">
+                                                Your Settlements
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true" rel="tooltip" data-toggle="tooltip" data-placement="top" title="The table indicates the amount and value of deals that have been settled (funded) each month and highlights if they were 'New deals' or 'Subsequent deals'"></i></h2>
+                                            <div style="margin-left:50px;">
+                                                <analytics:reportChart reportId="{!$Label.bPartner_settlementsReportID}" size="small">
+                                                </analytics:reportChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-6">
+                                    <div class="card border-light">
+                                        <div class="card-body" style="height: 375px;">
+                                            <h2 class="section-title">Your Key Conversions <i class="fa fa-exclamation-circle" aria-hidden="true" rel="tooltip" data-toggle="tooltip" data-placement="top" title=" Conversion Rates are based on a rolling 60 days"></i></h2>
+                                            
+                                            <div class="row" style="padding-top: 40px;">
+                                                
+                                                <div class="col-sm-4">
+                                                    <div class="circle_percent" data-percent="{!Application_Report}">
+                                                        <div class="circle_inner">
+                                                            <div class="round_per" style="background:#adcc48;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="circle_percent" data-percent="{!AppToOpp_Report}">
+                                                        <div class="circle_inner">
+                                                            <div class="round_per" style="background: #f1cd52;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="circle_percent" data-percent="{!OppToSet}">
+                                                        <div class="circle_inner">
+                                                            <div class="round_per" style="background: #28a1d8;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="text-align: center;">
+                                                <div class="col-sm-4">
+                                                    Leads To Applications
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    Applications To Opportunities
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    Opportunities To Settled
+                                                </div>
+                                            </div>
+                                            <!-- <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></Script>-->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!--Recent Opportunities End-->
+                    
+                    
+                    <!--Recent Opportunities Start-->
+                    
+                    <section class="page-section relative chart-sec">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    <div class="card border-light">
+                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/bizcap-ads.jpg')}"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-5">
+                                    <div class="card border-light">
+                                        <div class="card-innerimg mt-2 pl-3 pr-3 pb-1">
+                                            <h2 class="section-title">Bizcap Broker Cheat Sheet</h2>
+                                            <div class="chett-stdownimg text-center">
+                                                <!--<iframe src="data:{!att.ContentType};base64,{!pdf}"  width="100%" style="height: 400px; border: 1px solid grey;" type="application/pdf"></iframe>-->
+                                                <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/3.png')}" styleClass="img-responsive" style="height:212px;"/>
+                                                <!--<apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/broker-cheat-sheet.jpg')}"/>-->
+                                                <!--<a href="{!fileDownloadUrl}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                <apex:outputLink value="{!URLFOR($Action.Document.Download, downdoc)}" target="_blank" styleClass="btn btn-border mt-3 mb-2">Download</apex:outputLink>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!--Recent Opportunities End-->
+                    
+                </main>
+                <footer class="footer-main">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-3 ft ft-one">
+                                <h4 class="font-20 font-weight-bold ft-title">Useful Link</h4>
+                                <ul>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_HowItWorks}'); return false;" value="How It Works"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_AboutUs}'); return false;" value="About us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_PartnerUp}'); return false;" value="Partner Up"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_News}'); return false;" value="News"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ContactUs}'); return false;" value="Contact us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ApplyNow}'); return false;" value="Apply Now"/></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-two">
+                                <h4 class="font-20 font-weight-bold ft-title">Location</h4>
+                                <p>Suite 4, 322 St Kilda<br/>Rd, St Kilda VIC 3182</p>
+                            </div>
+                            <div class="col-sm-3 ft ft-three">
+                                <h4 class="font-20 font-weight-bold ft-title">Get in Contact</h4>
+                                <ul>
+                                    <li><i class="fa fa-envelope-o" aria-hidden="true"></i> <a href="mailto:info@bizcap.com.au">info@bizcap.com.au</a></li>
+                                    <li><i class="fa fa-phone" aria-hidden="true"></i> <a href="tel:1300922233">1300-922-233</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-five">
+                                <h4 class="font-20 font-weight-bold ft-title">Other</h4>
+                                <p>Copyright Zweb Ventures<br/>
+                                    PTY LTD (625 682 831) and <br/>
+                                    Bizcap AU Pty Ltd (54 633 927 <br/>
+                                    090) of PO Box 195, Balaclava<br/>
+                                    VIC 3183</p>
+                                <ul>
+                                    <li>
+                                        <apex:commandLink onclick="window.open('{!$Label.bPartner_Privacy_Policy}'); return false;" value="Privacy Policy"/>
+                                    </li>
+                                    <li>
+                                        <apex:commandLink onclick="window.open('{!$Label.bPartner_Terms_Of_Use}'); return false;" value="Terms of Use"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ft-bottom">
+                        <div class="container">
+                            <div class="row text-center">
+                                <h3>Connect with us:</h3>
+                                <div class="ft-social">
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_Facebook_URL}'); return false;" styleClass="fa fa-facebook"/>
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_LinkedIn_URL}'); return false;" styleClass="fa fa-linkedin"/>
+                                    
+                                    <!--<a href="#;"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+<a href="#;"><i class="fa fa-linkedin" aria-hidden="true"></i></a>-->
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </body>
+            
+            <script>
+            
+            $(".circle_percent").each(function() {
+                var $this = $(this),
+                    $dataV = $this.data("percent"),
+                    $dataDeg = $dataV * 3.6,
+                    $round = $this.find(".round_per");
+                $round.css("transform", "rotate(" + parseInt($dataDeg + 180) + "deg)"); 
+                $this.append('<div class="circle_inbox"><div class="circle_inner1"><span class="percent_text"></span></div></div>');
+                $this.prop('Counter', 0).animate({Counter: $dataV},
+                                                 {
+                                                     duration: 2000, 
+                                                     easing: 'swing', 
+                                                     step: function (now) {
+                                                         $this.find(".percent_text").text(Math.ceil(now)+"%");
+                                                     }
+                                                 });
+                if($dataV >= 51){
+                    $round.css("transform", "rotate(" + 360 + "deg)");
+                    setTimeout(function(){
+                        $this.addClass("percent_more");
+                    },1000);
+                    setTimeout(function(){
+                        $round.css("transform", "rotate(" + parseInt($dataDeg + 180) + "deg)");
+                    },1000);
+                } 
+            });
+            
+            
+            function thisweeklead(a)
+            {
+                console.log('clicked : ' + a);
+                pageredirect(a);
+                return false;
+            }
+            
+            function load()
+            {
+                window. open("/home/home. jsp", "_self");
+            }
+            
+            function logoutuser()
+            {
+                var lout = '$A.get($Label.c.bPartner_LogOutURL)';
+                window.location.replace("{!$Site.Prefix}/secur/logout.jsp?retUrl=lout");
+            }
+            
+            //ToolTip
+            
+            $( function()
+              {
+                  var targets = $( '[rel~=tooltip]' ),
+                      target  = false,
+                      tooltip = false,
+                      title   = false;
+                  
+                  targets.bind( 'mouseenter', function()
+                               {
+                                   target  = $( this );
+                                   tip     = target.attr( 'title' );
+                                   tooltip = $( '<div id="tooltip"></div>' );
+                                   
+                                   if( !tip || tip == '' )
+                                       return false;
+                                   
+                                   target.removeAttr( 'title' );
+                                   tooltip.css( 'opacity', 0 )
+                                   .html( tip )
+                                   .appendTo( 'body' );
+                                   
+                                   var init_tooltip = function()
+                                   {
+                                       if( $( window ).width() < tooltip.outerWidth() * 1.5 )
+                                           tooltip.css( 'max-width', $( window ).width() / 2 );
+                                       else
+                                           tooltip.css( 'max-width', 340 );
+                                       
+                                       var pos_left = target.offset().left + ( target.outerWidth() / 2 ) - ( tooltip.outerWidth() / 2 ),
+                                           pos_top  = target.offset().top - tooltip.outerHeight() - 20;
+                                       
+                                       if( pos_left < 0 )
+                                       {
+                                           pos_left = target.offset().left + target.outerWidth() / 2 - 20;
+                                           tooltip.addClass( 'left' );
+                                       }
+                                       else
+                                           tooltip.removeClass( 'left' );
+                                       
+                                       if( pos_left + tooltip.outerWidth() > $( window ).width() )
+                                       {
+                                           pos_left = target.offset().left - tooltip.outerWidth() + target.outerWidth() / 2 + 20;
+                                           tooltip.addClass( 'right' );
+                                       }
+                                       else
+                                           tooltip.removeClass( 'right' );
+                                       
+                                       if( pos_top < 0 )
+                                       {
+                                           var pos_top  = target.offset().top + target.outerHeight();
+                                           tooltip.addClass( 'top' );
+                                       }
+                                       else
+                                           tooltip.removeClass( 'top' );
+                                       
+                                       tooltip.css( { left: pos_left, top: pos_top } )
+                                       .animate( { top: '+=10', opacity: 1 }, 50 );
+                                   };
+                                   
+                                   init_tooltip();
+                                   $( window ).resize( init_tooltip );
+                                   
+                                   var remove_tooltip = function()
+                                   {
+                                       tooltip.animate( { top: '-=10', opacity: 0 }, 50, function()
+                                                       {
+                                                           $( this ).remove();
+                                                       });
+                                       
+                                       target.attr( 'title', tip );
+                                   };
+                                   
+                                   target.bind( 'mouseleave', remove_tooltip );
+                                   tooltip.bind( 'click', remove_tooltip );
+                               });
+              });
+            
+            </script>
+        </html>
+    </apex:form>
+</apex:page>

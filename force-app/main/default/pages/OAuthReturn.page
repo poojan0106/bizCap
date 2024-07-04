@@ -1,0 +1,4 @@
+<apex:page controller="OAuthRestController" action="{!login}">
+  <h1>Generating token...</h1>
+
+</apex:page>

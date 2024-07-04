@@ -1,0 +1,31 @@
+<aura:component controller="OAuthRestBPUController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <aura:attribute name="loginLink" type="string"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="hasRecord" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="string"/>  
+    <aura:attribute name="APIDetailRecordId" type="string"/> 
+    <aura:attribute name="APIDetail" type="BPU_API_Details__c"/>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner size="medium" variant="brand" />
+    </aura:if>
+
+	<lightning:card title="BPU Integration Token" iconName="standard:data_integration_hub">  
+        <aura:if isTrue="{!v.hasRecord}">
+            <lightning:recordViewForm recordId="{!v.APIDetail.Id}" objectApiName="BPU_API_Details__c">
+                <div class="slds-box">
+                    <lightning:outputField fieldName="BPU_Refresh_Token__c" />
+                    <lightning:outputField fieldName="BPU_GET_URL__c" />
+                </div>
+            </lightning:recordViewForm>
+        </aura:if>
+        <div class="slds-p-around_medium">
+        	<a class="slds-button slds-button_brand" href="{!v.loginLink}" target="_blank"	>Generate Token</a>
+        </div>
+        
+    </lightning:card>
+
+</aura:component>

@@ -1,0 +1,1418 @@
+<apex:page id="dealspage" controller="bPartner_dealPageController" cache="false" standardStylesheets="false" showHeader="false" lightningStylesheets="false" sidebar="false" name="bPart deals" docType="HTML-5.0">    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+   
+            <script language="JavaScript">
+                function ClipBoard(copytextid, holdtextid){
+                copyToClipboard(copytextid);
+            }
+            
+            
+            function copyToClipboard(elementId) {
+                // Create an auxiliary hidden input
+                var aux = document.createElement("input");
+                // Get the text from the element passed into the input
+                aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+                // Append the aux input to the body
+                document.body.appendChild(aux);
+                // Highlight the content
+                aux.select();
+                // Execute the copy command
+                document.execCommand("copy");
+                // Remove the input from the body
+                document.body.removeChild(aux);
+            }
+    $(function() {
+        $('input[name="datefilter"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            console.log(picker.startDate.format('DD/MM/YYYY'));
+            console.log(picker.endDate.format('DD/MM/YYYY'));
+            //checkDates(picker.startDate.format('YYYY-MM-DD'),picker.endDate.format('YYYY-MM-DD'));
+        });
+        $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+    });    
+    
+    </script>   
+    <style>
+        .navbar-expand-md .navbar-nav{
+        align-items: center;
+        }
+        .url
+        {
+        height: 0px;
+        width:0px;
+        visibility:hidden;
+        }
+        .table-section {
+        overflow-x: unset;
+        overflow-y: hidden;
+        }
+        .LeadClass
+        {
+        padding: 6px;
+        margin-right: 6px;
+        border: none;
+        background: white;
+        border-block-end: unset;
+        color: black;
+        }
+        .AppClass
+        {
+        padding: 6px;
+        margin-right: 6px;
+        border: none;
+        background: white;
+        border-block-end: unset;
+        color: black;
+        }
+        .OppClass
+        {
+        padding: 6px;
+        margin-right: 6px;
+        border: none;
+        background: white;
+        border-block-end: unset;
+        color: black;
+        }
+        .SetClass
+        {
+        padding: 6px;
+        margin-right: 6px;
+        border: none;
+        background: white;
+        border-block-end: unset;
+        color: black;
+        }
+        .SearchButton
+        {
+        margin-left: 6px;
+        border: 1px solid #0f0f0f;
+        background: rgb(225 245 255);
+        border-radius: 5px;
+        padding:4.5px 4px 4px 4px;
+        color: black;
+        }
+        .CrossButton
+        {
+        background: white; 
+        margin-left:6px; 
+        //font-size:15px; 
+        border: 1px solid #0f0f0f;
+        border-radius: 5px;
+        padding:4px 6px 4px 6px;
+        color: black;
+        }
+        .PaginationButtons
+        {
+        border: 1px solid #0f0f0f;
+        color:black;
+        padding-left:7px;
+        padding-right:7px;
+        background:rgb(225 245 255);
+        }
+        .iButton{
+        color: #0a77d2;
+        }
+        #tooltip
+        {
+        text-align: center;
+        color: #fff;
+        background: #111;
+        position: absolute;
+        z-index: 100;
+        padding: 15px;
+        font-size: 11px;
+        }
+        
+        #tooltip:after /* triangle decoration */
+        {
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #111;
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        margin-left: -10px;
+        }
+        
+        #tooltip.top:after
+        {
+        border-top-color: transparent;
+        border-bottom: 10px solid #111;
+        top: -20px;
+        bottom: auto;
+        }
+        
+        #tooltip.left:after
+        {
+        left: 10px;
+        margin: 0;
+        }
+        
+        #tooltip.right:after
+        {
+        right: 10px;
+        left: auto;
+        margin: 0;
+        }
+        .closeButton
+        {
+        margin-left: 6px;
+        border: 1px solid #0f0f0f;
+        border-radius: 5px;
+        padding:4px 4px 4px 4px;
+        color: black;
+        }
+    </style>
+    <apex:form id="dealsForm">
+        
+        <html lang="en" id = "dealHtml">
+            <head>
+                <title>Bizcap Deals</title><!-- Bootstrap core CSS -->
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <meta name="generator" content="" />
+                
+                <!-- Custom styles for this template -->
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+                <!--font-family: 'Montserrat', sans-serif;-->
+                
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/jquery.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/bootstrap.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/chartjs.init.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/Chart.min.js')}"/>
+            </head>
+            <body id="top-bodydeal">
+                <header class="navbar-dark fixed-top">
+                    <div class="mian-header">
+                        <div class="container">
+                            <div class="row ">
+                                <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                    <div class="navbar-brand">
+                                        <a class="" href="{!$Label.bPartner_HomeURL}" target="_top">
+                                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/logo.png')}"/>
+                                        </a>
+                                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="collapse navbar-collapse ml-auto" id="navbarCollapse">
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item "><a class="nav-link" href="{!$Label.bPartner_HomeURL}" target="_top">Home</a></li>
+                                            <li class="nav-item"><a class="nav-link" href="{!$Label.bPartner_DealsURL}" target="_top">Deals</a></li>
+                                            <li class="nav-item"><a class="nav-link" href="{!$Label.bPartner_ResourceURL}" target="_top">Resources</a></li>
+                                            <li class="nav-item"><apex:outputText styleClass="fa fa-phone" />
+                                                <span>1300 922 233</span></li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="haedrcntnumber  ml-auto">
+                                        <ul>
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-user" aria-hidden="true"></i> 
+                                                    <span>{!currentuser.Name}</span>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    <!--<apex:commandLink Styleclass="dropdown-item" value="Dashboard"/>-->
+                                                    <a class="dropdown-item" href="{!$Label.bPartner_ProfileURL}{!currentuser.Id}" target="_top">My Profile</a>
+                                                    <a class="dropdown-item"><apex:outputLabel onclick="logoutuser();"> Logout </apex:outputLabel> </a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </header>                
+                <main role="main" class="main-part">
+                    <!--Your Snapshot End-->
+                    <section class="deal-main page-section relative">
+                        <div class="deal-top-nav">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        <a class="nav-item nav-link active" id="nav-lead-tab" data-toggle="tab" href="#lead" role="tab" aria-controls="nav-lead" aria-selected="true"><span class="nv-icon1"></span>Leads</a>
+                                        <a class="nav-item nav-link" id="nav-application-tab" data-toggle="tab" href="#application" role="tab" aria-controls="nav-application" aria-selected="false" onclick="Applications();"><span class="nv-icon2"></span>Applications</a>
+                                        <a class="nav-item nav-link" id="nav-oppor-created-tab" data-toggle="tab" href="#oppor-created" role="tab" aria-controls="nav-oppor-created" aria-selected="false" onClick="Opportunity();"><span class="nv-icon3"></span>Opportunities</a>
+                                        <a class="nav-item nav-link" id="nav-settled-tab" data-toggle="tab" href="#settled" role="tab" aria-controls="nav-settled" aria-selected="false" onClick="Settled();"><span class="nv-icon4"></span>Settled</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content deal-tab-content" id="nav-tabContent">
+                            <div class="container">
+                                <div class="row">
+                                    <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                        
+                                        <!--Lead Start-->
+                                        <div class="tab-pane fade show active" id="lead" role="tabpanel" aria-labelledby="nav-lead-tab">
+                                            <div class = "text-center text-blue">
+                                                <h6>Submitted Lead Overview</h6>
+                                            </div>
+                                            <div class="tab-inner">
+                                                <div class="tab-inner-acc">
+                                                    <apex:commandLink value="Today" id="todayLead" onclick="LeadsCalling('Today Leads', id); return false;" styleClass="LeadClass"/>
+                                                    <apex:commandLink value="This Week" id="TWLead" onclick="LeadsCalling('This Week Leads',id); return false;" styleClass="LeadClass"/>
+                                                    <apex:commandLink value="Last Week" id="LWLeads" onclick="LeadsCalling('Last Week Leads', id); return false;" styleClass="LeadClass"/>
+                                                    <apex:commandLink value="This Month" id="TMLeads" onclick="LeadsCalling('This Month Leads',id); return false;" styleClass="LeadClass"/>
+                                                    <apex:commandLink value="Last Month" id="LMLeads" onclick="LeadsCalling('Last Month Leads',id); return false;" styleClass="LeadClass"/>
+                                                    <apex:commandLink value="This Year" id="TYLeads" onclick="LeadsCalling('This Year Leads',id); return false;" styleClass="LeadClass"/>
+                                                    
+                                                    <apex:actionFunction action="{!CallLeads}" name="CallLeads" reRender="LeadPanel,searchL,LeadStatus,LeadSubStatus,LeadPanel_PickDate">
+                                                        <apex:param name="WhatLead" value=""/>
+                                                    </apex:actionFunction>
+                                                    
+                                                    <apex:commandLink value="Pick Dates" id="PDLeads" onclick="LeadsCalling('Pick Dates Leads',id); return false;" styleClass="LeadClass"/>
+                                                    <apex:actionFunction name="picDate_Click_Lead" action="{!picDate_Click_Lead}" reRender="LeadPanel,searchL,LeadStatus,LeadSubStatus,LeadPanel_PickDate"/>
+                                                </div>
+                                                <div class="tab-inner-acc" style="margin-top:15px;">
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <apex:selectList id="LeadStatus" value="{!leadStatus}" size="1" style="width:200px; margin-right:20px;" onchange="LeadStatusChanged(); return false;">              
+                                                                <apex:selectOptions value="{!leadStatusAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:actionFunction action="{!dependent_Lead_Sub_Stattus}" name="dependent_Lead_Sub_Stattus" reRender="LeadSubStatus"/>
+                                                            <apex:selectList value="{!leadSubStatus}" size="1" id="LeadSubStatus" style="width:200px; margin-right:15px;" disabled="{!LeadSubStatusAll.size<2}">              
+                                                                <apex:selectOptions value="{!LeadSubStatusAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:commandLink action="{!filterLeads}" id="LeadFilter" reRender="LeadPanel" status="LeadSpinner" styleClass="SearchButton fa fa-filter" />
+                                                            <apex:commandLink action="{!filterLeads_cancel}" reRender="LeadPanel,LeadStatus,LeadSubStatus" status="LeadSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" rel="tooltip" data-placement="top" title="You can search based on the customers name or company name" style="color:#0a77d2; margin-right:5px;"></i>
+                                                            <apex:inputText value="{!LeadSearch}" id="searchL" html-placeholder="Search Leads" onkeypress="EnterKey(id);" style="width:200px;border-radius: 5px;border-width:1px;"/>
+                                                            <apex:commandLink action="{!searchLead}" id="LeadSearch" reRender="LeadPanel" status="LeadSpinner" styleClass="SearchButton fa fa-search"/>
+                                                            <apex:commandLink action="{!CancelLead}" reRender="LeadPanel,searchL" status="LeadSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <apex:outputPanel id="LeadPanel_PickDate">
+                                                            <apex:outputPanel rendered="{!PickDatesLeadPAnel}">
+                                                                <div style="font-size:12px;">     
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>From <br/>
+                                                                                <apex:input type="date" value="{!startDate_Lead}" /></td>
+                                                                            <td>To <br/>
+                                                                                <apex:input type="date" value="{!endDate_Lead}" /> </td>
+                                                                            <td  style="padding-top:18px;">
+                                                                                <apex:commandLink action="{!picDate_Click_Lead}" status="LeadSpinner" value="Apply" reRender="LeadPanel" styleClass="SearchButton"/>
+                                                                                <apex:commandLink action="{!Clear_picDate_Click_Lead}" status="LeadSpinner" value="Clear" reRender="LeadPanel,LeadPanel_PickDate" styleClass="closeButton"/>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </apex:outputPanel>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-content tab-deal-inner  col-sm-12">
+                                                    <apex:outputPanel id="LeadPanel">
+                                                        <div class="card border-no">
+                                                            <div class="row">
+                                                                <apex:outputPanel rendered="{!LeadList.size != 0}" layout="none">
+                                                                    <div class="note-record text-blue font-12 font-normal mb-2" style="margin-right:50px;">
+                                                                        {!totalLeads} Lead(s) Showing
+                                                                        {!if(WhatLead1 == 'Today Leads', 'For Today',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatLead1 == 'This Week Leads')}">
+                                                                            &nbsp;For This Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!StartDate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!EndDate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatLead1 == 'Last Week Leads')}">
+                                                                            &nbsp;For Last Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!LastWeekSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastWeekEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatLead1 == 'This Month Leads')}">
+                                                                            &nbsp;For This Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatLead1 == 'Last Month Leads')}">
+                                                                            &nbsp;For Last Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        {!if(WhatLead1 == 'This Year Leads', 'For This Year',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatLead1 == 'Pick Dates Leads')}">
+                                                                            &nbsp;For Dates (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!startDate_Lead}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!endDate_Lead}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                    </div>
+                                                                    <apex:actionStatus id="LeadSpinner">
+                                                                        <apex:facet name="start">
+                                                                            <apex:outputPanel >
+                                                                                <img src="/img/loading32.gif" width="25" height="25" />
+                                                                                <apex:outputLabel value="Loading..."/>
+                                                                            </apex:outputPanel>            
+                                                                        </apex:facet>
+                                                                    </apex:actionStatus>
+                                                                    <div class="table-section">
+                                                                        
+                                                                        <table class="table">
+                                                                            <thead>
+                                                                                <tr><th scope="col">Broker Name</th>
+                                                                                    <th scope="col">Create Date</th>
+                                                                                    <th scope="col">First Name</th>
+                                                                                    <th scope="col">Last Name</th>
+                                                                                    <th scope="col">Company</th>
+                                                                                    <th scope="col">Lead<br/>Status</th>
+                                                                                    <th scope="col">Lead Sub<br/>Status</th>
+                                                                                    <th scope="col">Status Change<br/>Date</th>
+                                                                                    <th scope="col">Application<br/>Form URL</th>
+                                                                                    <th scope="col">Sub Status<br/>Change Date</th>
+                                                                                    <th scope="col">Amount<br/>Requested</th>
+                                                                                    <th scope="col">Last Activity Date</th></tr></thead>
+                                                                            
+                                                                            <tbody>
+                                                                                <apex:repeat value="{!LeadList}" var="today">
+                                                                                    <tr>
+                                                                                        <td>{!today.Broker_Name__c}</td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.CreatedDate}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>{!today.firstname}</td>
+                                                                                        <td>{!today.lastname}</td>
+                                                                                        <td>{!today.company}</td>
+                                                                                        <td>{!today.status}</td>
+                                                                                        <td>{!today.Lead_Sub_Status__c}</td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.Lead_Status_Change_Date__c}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>  
+                                                                                            <div class="url">
+                                                                                                <apex:outputpanel Id="copytext">
+                                                                                                    {!today.Form_Update_URL__c}
+                                                                                                </apex:outputpanel>
+                                                                                            </div>          
+                                                                                            <apex:commandbutton onClick="ClipBoard('{!$Component.copytext}', '{!$Component.holdtext}')" value="Copy URL" styleclass="btn-border" reRender="copytext" style="margin-left:-5px;"/></td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.Lead_Sub_Status_Date_Changed__c}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c!=null}">
+                                                                                                ${!FLOOR(today.Amount_requested__c)}
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            
+                                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                                <apex:param value="{!today.LastModifiedDate}" /> 
+                                                                                            </apex:outputText>
+                                                                                            
+                                                                                        </td>
+                                                                                        
+                                                                                    </tr>
+                                                                                </apex:repeat>
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <!--<apex:commandButton action="{!BeginningLead}" title="Beginning" value="<<" disabled="{!disablePrevious}" reRender="LeadPanel"/>
+<apex:commandButton action="{!PreviousLead}" title="Previous" value="<" disabled="{!disablePrevious}" reRender="LeadPanel"/>
+<apex:commandButton action="{!NextLead}" title="Next" value=">" disabled="{!disableNext}" reRender="LeadPanel"/>
+<apex:commandButton action="{!EndLead}" title="End" value=">>" disabled="{!disableNext}" reRender="LeadPanel"/>-->
+                                                                        
+                                                                    </div><!--Table Contene End-->
+                                                                    
+                                                                    <apex:commandLink action="{!BeginningLead}" title="Beginning" value="<<" rendered="{!NOT(disablePrevious)}" reRender="LeadPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!PreviousLead}" title="Previous" value="<" rendered="{!NOT(disablePrevious)}" reRender="LeadPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!NextLead}" title="Next" value=">" rendered="{!NOT(disableNext)}" reRender="LeadPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!EndLead}" title="End" value=">>" rendered="{!NOT(disableNext)}" reRender="LeadPanel" styleClass="PaginationButtons"/>
+                                                                    
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!LeadList.size == 0}" styleClass="table-section">
+                                                                    <div class="nodatafound">
+                                                                        <h2>We Couldn't find any results.</h2>
+                                                                        <h4>Try adjusting your filters.</h4>
+                                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/no-resultsfound.gif')}"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                                
+                                                            </div><!--Card Body End-->
+                                                        </div>
+                                                    </apex:outputPanel>
+                                                </div>
+                                                <!--Deal Inner tab End-->
+                                            </div>
+                                        </div>
+                                        <!--Lead End-->
+                                        
+                                        <!--Application Start-->
+                                        <div class="tab-pane fade" id="application" role="tabpanel" aria-labelledby="nav-application-tab">
+                                            <div class = "text-center text-blue">
+                                                <h6>Your Applications</h6>
+                                            </div>
+                                            <div class="tab-inner">
+                                                <div class="tab-inner-acc">
+                                                    <apex:commandLink value="Today" id="todayApp" onclick="AppCalling('Today Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:commandLink value="This Week" id="TWApp" onclick="AppCalling('This Week Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:commandLink value="Last Week" id="LWApp" onclick="AppCalling('Last Week Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:commandLink value="This Month" id="TMApp" onclick="AppCalling('This Month Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:commandLink value="Last Month" id="LMApp" onclick="AppCalling('Last Month Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:commandLink value="This Year" id="TYApp" onclick="AppCalling('This Year Apps',id); return false;" styleClass="AppClass"/>
+                                                    
+                                                    <apex:actionFunction action="{!CallApps}" name="CallApps" reRender="AppPanel,AppStatus,AppSubStatus,searchA,AppPanel_PickDate">
+                                                        <apex:param name="WhatApp" value=""/>
+                                                    </apex:actionFunction>
+                                                    
+                                                    <apex:commandLink value="Pick Dates" id="PDApp" onclick="AppCalling('Pick Dates Apps',id); return false;" styleClass="AppClass"/>
+                                                    <apex:actionFunction action="{!picDate_Click_App}" name="picDate_Click_App" reRender="AppPanel,AppStatus,AppSubStatus,searchA,AppPanel_PickDate"/>
+                                                </div>
+                                                <div class="tab-inner-acc" style="margin-top:15px;">
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <apex:selectList id="AppStatus" value="{!AppStatus}" size="1" style="width:200px; margin-right:20px;" onchange="AppStatusChanged(); return false;">              
+                                                                <apex:selectOptions value="{!leadStatusAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:actionFunction action="{!dependent_Lead_Sub_Stattus}" name="dependent_App_Sub_Stattus" reRender="AppSubStatus"/>
+                                                            <apex:selectList value="{!AppSubStatus}" size="1" id="AppSubStatus" style="width:200px; margin-right:20px;" disabled="{!LeadSubStatusAll.size<2}">              
+                                                                <apex:selectOptions value="{!LeadSubStatusAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:commandLink action="{!filterApps}" id="AppFilter" reRender="AppPanel" status="AppSpinner" styleClass="SearchButton fa fa-filter"/>
+                                                            <apex:commandLink action="{!filterApps_cancel}" reRender="AppPanel,AppStatus,AppSubStatus" status="AppSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" rel="tooltip" data-placement="top" title="You can search based on the customers name or company name" style="color:#0a77d2; margin-right:5px;"></i>
+                                                            <apex:inputText value="{!AppSearch}" id="searchA" html-placeholder="Search Applications" onkeypress="EnterKey(id);" style="width:200px;border-radius: 5px;border-width:1px;"/>
+                                                            <apex:commandLink action="{!SearchApp}" id="AppSearch" reRender="AppPanel" status="AppSpinner" styleClass="SearchButton fa fa-search"/>
+                                                            <apex:commandLink action="{!CancelApp}" reRender="AppPanel,searchA" status="AppSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <apex:outputPanel id="AppPanel_PickDate">
+                                                            <apex:outputPanel rendered="{!PickDatesAppPAnel}">
+                                                                <div style="font-size:12px;">     
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>From <br/>
+                                                                                <apex:input type="date" value="{!startDate_App}" /></td>
+                                                                            <td>To <br/>
+                                                                                <apex:input type="date" value="{!endDate_App}" /> </td>
+                                                                            <td  style="padding-top:18px;">
+                                                                                <apex:commandLink action="{!picDate_Click_App}" status="AppSpinner" value="Apply" reRender="AppPanel" styleClass="SearchButton"/>
+                                                                                <apex:commandLink action="{!Clear_picDate_Click_App}" status="AppSpinner" value="Clear" reRender="AppPanel,AppPanel_PickDate" styleClass="closeButton"/>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </apex:outputPanel>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                    
+                                                    
+                                                </div>
+                                                <div class="tab-content tab-deal-inner  col-sm-12">
+                                                    <apex:outputPanel id="AppPanel">
+                                                        <div class="card border-no">
+                                                            <div class="row">
+                                                                <apex:outputPanel rendered="{!Applications.size != 0}" layout="none">
+                                                                    <div class="note-record text-blue font-12 font-normal mb-2">
+                                                                        {!totalApps} Application(s) Showing
+                                                                        {!if(WhatApp1 == 'Today Apps', 'For Today',null)} 
+                                                                        <apex:outputPanel rendered="{!(WhatApp1 == 'This Week Apps')}">
+                                                                            &nbsp;For This Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!StartDate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!EndDate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatApp1 == 'Last Week Apps')}">
+                                                                            &nbsp;For Last Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!LastWeekSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastWeekEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatApp1 == 'This Month Apps')}">
+                                                                            &nbsp;For This Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatApp1 == 'Last Month Apps')}">
+                                                                            &nbsp;For Last Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        {!if(WhatApp1 == 'This Year Apps', 'For This Year',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatApp1 == 'Pick Dates Apps')}">
+                                                                            &nbsp;For Dates (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!startDate_App}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!endDate_App}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                    </div>
+                                                                    <apex:actionStatus id="AppSpinner">
+                                                                        <apex:facet name="start">
+                                                                            <apex:outputPanel >
+                                                                                <img src="/img/loading32.gif" width="25" height="25" />
+                                                                                <apex:outputLabel value="Loading..."/>
+                                                                            </apex:outputPanel>            
+                                                                        </apex:facet>
+                                                                    </apex:actionStatus>
+                                                                    <div class="table-section">
+                                                                        <table class="table">
+                                                                            <thead><tr><th scope="col">Broker Name</th>
+                                                                                <th scope="col">Lead Created Date</th>
+                                                                                <th scope="col">Submission Created Date</th>
+                                                                                <th scope="col">First Name</th>
+                                                                                <th scope="col">Last Name</th>
+                                                                                <th scope="col">Company</th>
+                                                                                <th scope="col">Lead<br/>Status</th>
+                                                                                <th scope="col">Lead Sub Status</th>
+                                                                                <th scope="col">Amount<br/>Requested</th>
+                                                                                <th scope="col">Conditional Approval<br/>Amount</th></tr></thead>
+                                                                            <tbody>
+                                                                                <apex:repeat value="{!Applications}" var="today">
+                                                                                    <tr><td>{!today.Broker_Name__c}</td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.CreatedDate}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.Latest_Date__c}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>{!today.firstname}</td>
+                                                                                        <td>{!today.lastname}</td>
+                                                                                        <td>{!today.company}</td>
+                                                                                        <td>{!today.status}</td>
+                                                                                        <td>{!today.Lead_Sub_Status__c}</td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c!=null}">
+                                                                                                ${!FLOOR(today.Amount_requested__c)}
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Conditional_Approval_Amount__c!=null}">
+                                                                                                ${!FLOOR(today.Conditional_Approval_Amount__c)}
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Conditional_Approval_Amount__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel></td>
+                                                                                    </tr>
+                                                                                </apex:repeat>
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <!--<apex:commandButton action="{!Beginning_App}" title="Beginning" value="<<" disabled="{!disablePrevious_App}" reRender="AppPanel"/>
+<apex:commandButton action="{!Previous_App}" title="Previous" value="<" disabled="{!disablePrevious_App}" reRender="AppPanel"/>        
+<apex:commandButton action="{!Next_App}" title="Next" value=">" disabled="{!disableNext_App}" reRender="AppPanel"/>
+<apex:commandButton action="{!End_App}" title="End" value=">>" disabled="{!disableNext_App}" reRender="AppPanel"/>  -->
+                                                                    </div><!--Table Contene End-->
+                                                                    <apex:commandLink action="{!Beginning_App}" title="Beginning" value="<<" rendered="{!NOT(disablePrevious_App)}" reRender="AppPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!Previous_App}" title="Previous" value="<" rendered="{!NOT(disablePrevious_App)}" reRender="AppPanel" styleClass="PaginationButtons"/>        
+                                                                    <apex:commandLink action="{!Next_App}" title="Next" value=">" rendered="{!NOT(disableNext_App)}" reRender="AppPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!End_App}" title="End" value=">>" rendered="{!NOT(disableNext_App)}" reRender="AppPanel" styleClass="PaginationButtons"/>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!Applications.size == 0}">
+                                                                    <div class="nodatafound">
+                                                                        <h2>We Couldn't find any results.</h2>
+                                                                        <h4>Try adjusting your filters.</h4>
+                                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/no-resultsfound.gif')}"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                                
+                                                            </div><!--Card Body End-->
+                                                        </div>
+                                                    </apex:outputPanel>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--Application End--> 
+                                        
+                                        <!--Opportunities Created Start-->
+                                        <div class="tab-pane fade" id="oppor-created" role="tabpanel" aria-labelledby="nav-oppor-created">
+                                            <div class = "text-center text-blue">
+                                                <h6>Opportunities Overview</h6>
+                                            </div>
+                                            <div class="tab-inner">
+                                                <div class="tab-inner-acc">
+                                                    
+                                                    <apex:commandLink value="Today" id="todayOpp" onclick="OppCalling('Today Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:commandLink value="This Week" id="TWOpp" onclick="OppCalling('This Week Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:commandLink value="Last Week" id="LWOpp" onclick="OppCalling('Last Week Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:commandLink value="This Month" id="TMOpp" onclick="OppCalling('This Month Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:commandLink value="Last Month" id="LMOpp" onclick="OppCalling('Last Month Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:commandLink value="This Year" id="TYOpp" onclick="OppCalling('This Year Opps',id); return false;" styleClass="OppClass"/>
+                                                    <apex:actionFunction action="{!CallOpportunity}" name="CallOpportunity" reRender="OppPanel,OppStatus,OppSubStatus,searchO,OppPanel_PickDate">
+                                                        <apex:param name="WhatOpp" value=""/>
+                                                    </apex:actionFunction>
+                                                    <apex:commandLink value="Pick Dates" id="PDOpp" onclick="OppCalling('Pick Dates Opp',id); return false;" styleClass="OppClass"/>
+                                                    <apex:actionFunction name="picDate_Click_Opp" action="{!picDate_Click_Opp}" reRender="OppPanel,OppStatus,OppSubStatus,searchO,OppPanel_PickDate"/>
+                                                    
+                                                </div>
+                                                <div class="tab-inner-acc" style="margin-top:15px;">
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <apex:selectList id="OppStatus" value="{!OppStage}" size="1" style="width:200px; margin-right:20px;" onchange="OppStageChanged(); return false;">              
+                                                                <apex:selectOptions value="{!Opp_StageAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:actionFunction action="{!dependent_Opp_Sub_Stage}" name="dependent_Opp_Sub_Stage" reRender="OppSubStatus"/>
+                                                            <apex:selectList value="{!OppSubStage}" size="1" id="OppSubStatus" style="width:200px; margin-right:20px;" disabled="{!Opp_SubStageAll.size<2}">              
+                                                                <apex:selectOptions value="{!Opp_SubStageAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:commandLink action="{!filterOpps}" id="OppFilter" reRender="OppPanel" status="OppSpinner" styleClass="SearchButton fa fa-filter"/>
+                                                            <apex:commandLink action="{!filterOpps_cancel}" reRender="OppPanel,OppStatus,OppSubStatus" status="OppSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" rel="tooltip" data-placement="top" title="You can search based on the customers name or company name" style="color:#0a77d2; margin-right:5px;"></i>
+                                                            <apex:inputText value="{!OppSearch}" id="searchO" html-placeholder="Search Opportunities" onkeypress="EnterKey(id);" style="width:200px;border-radius: 5px;border-width:1px;"/>
+                                                            <apex:commandLink action="{!SearchOpp}" id="OppSearch" reRender="OppPanel" status="OppSpinner" styleClass="SearchButton fa fa-search"/>
+                                                            <apex:commandLink action="{!CancelOpp}" reRender="OppPanel,searchO" status="OppSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div></div>
+                                                    <div class="row">
+                                                        <apex:outputPanel id="OppPanel_PickDate">
+                                                            <apex:outputPanel rendered="{!PickDatesOppPAnel}">
+                                                                <div style="font-size:12px;">     
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>From <br/>
+                                                                                <apex:input type="date" value="{!startDate_Opp}" /></td>
+                                                                            <td>To <br/>
+                                                                                <apex:input type="date" value="{!endDate_Opp}" /> </td>
+                                                                            <td  style="padding-top:18px;">
+                                                                                <apex:commandLink action="{!picDate_Click_Opp}" status="OppSpinner" value="Apply" reRender="OppPanel" styleClass="SearchButton"/>
+                                                                                <apex:commandLink action="{!Clear_picDate_Click_Opp}" status="AppSpinner" value="Clear" reRender="OppPanel,OppPanel_PickDate" styleClass="closeButton"/>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </apex:outputPanel>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-content tab-deal-inner  col-sm-12">
+                                                    <apex:outputPanel id="OppPanel">
+                                                        <div class="card border-no">
+                                                            <div class="row">
+                                                                <apex:outputPanel rendered="{!Opportunities.size != 0}" layout="none">
+                                                                    <div class="note-record text-blue font-12 font-normal mb-2">
+                                                                        {!totalOpps} Opportunities Showing
+                                                                        {!if(WhatOpp1 == 'Today Opps', 'For Today',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatOpp1 == 'This Week Opps')}">
+                                                                            &nbsp;For This Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!StartDate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!EndDate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatOpp1 == 'Last Week Opps')}">
+                                                                            &nbsp;For Last Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!LastWeekSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastWeekEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatOpp1 == 'This Month Opps')}">
+                                                                            &nbsp;For This Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatOpp1 == 'Last Month Opps')}">
+                                                                            &nbsp;For Last Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        {!if(WhatOpp1 == 'This Year Opps', 'For This Year',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatOpp1 == 'Pick Dates Opp')}">
+                                                                            &nbsp;For Dates (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!startDate_Opp}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!endDate_Opp}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                    </div>
+                                                                    <apex:actionStatus id="OppSpinner">
+                                                                        <apex:facet name="start">
+                                                                            <apex:outputPanel >
+                                                                                <img src="/img/loading32.gif" width="25" height="25" />
+                                                                                <apex:outputLabel value="Loading..."/>
+                                                                            </apex:outputPanel>            
+                                                                        </apex:facet>
+                                                                    </apex:actionStatus>
+                                                                    <div class="table-section">
+                                                                        <table class="table">
+                                                                            <thead><tr><th scope="col">Broker Name</th>
+                                                                                <th scope="col">Submission Create Date</th>
+                                                                                <th scope="col">Name</th>
+                                                                                <th scope="col">Company</th>
+                                                                                <th scope="col">Opportunity<br/>Stage</th>
+                                                                                <th scope="col">Sub Stage</th>
+                                                                                <th scope="col">Conditional Approval<br/>Amount</th>
+                                                                                <th scope="col">Amount<br/>Requested</th></tr></thead>
+                                                                            
+                                                                            <tbody>
+                                                                                <apex:repeat value="{!Opportunities}" var="today">
+                                                                                    <tr><td>{!today.Broker_Name__c}</td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.CreatedDate}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>{!today.Contact__r.name}</td>
+                                                                                        <td>{!today.Account.name}</td>
+                                                                                        <td>{!today.StageName}</td> 
+                                                                                        <td>{!today.Sub_stage__c}</td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Conditional_Approval_Amount__c!=null}">
+                                                                                                ${!FLOOR(today.Conditional_Approval_Amount__c)}
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Conditional_Approval_Amount__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c!=null}">
+                                                                                                ${!FLOOR(today.Amount_requested__c)}
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Amount_requested__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </apex:repeat>
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <!--<apex:commandButton action="{!Beginning_Opp}" title="Beginning" value="<<" disabled="{!disablePrevious_Opp}" reRender="OppPanel"/>
+<apex:commandButton action="{!Previous_Opp}" title="Previous" value="<" disabled="{!disablePrevious_Opp}" reRender="OppPanel"/>        
+<apex:commandButton action="{!Next_Opp}" title="Next" value=">" disabled="{!disableNext_Opp}" reRender="OppPanel"/>
+<apex:commandButton action="{!End_Opp}" title="End" value=">>" disabled="{!disableNext_Opp}" reRender="OppPanel"/>-->  
+                                                                    </div><!--Table Contene End-->
+                                                                    <apex:commandLink action="{!Beginning_Opp}" title="Beginning" value="<<" rendered="{!NOT(disablePrevious_Opp)}" reRender="OppPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!Previous_Opp}" title="Previous" value="<" rendered="{!NOT(disablePrevious_Opp)}" reRender="OppPanel" styleClass="PaginationButtons"/>        
+                                                                    <apex:commandLink action="{!Next_Opp}" title="Next" value=">" rendered="{!NOT(disableNext_Opp)}" reRender="OppPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!End_Opp}" title="End" value=">>" rendered="{!NOT(disableNext_Opp)}" reRender="OppPanel" styleClass="PaginationButtons"/>  
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!Opportunities.size == 0}">
+                                                                    <div class="nodatafound">
+                                                                        <h2>We Couldn't find any results.</h2>
+                                                                        <h4>Try adjusting your filters.</h4>
+                                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/no-resultsfound.gif')}"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                                
+                                                            </div><!--Card Body End-->
+                                                        </div>
+                                                    </apex:outputPanel>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--Opportunities Created End-->
+                                        
+                                        <!--Settled  Start-->
+                                        <div class="tab-pane fade" id="settled" role="tabpanel" aria-labelledby="nav-settled">
+                                            <div class = "text-center text-blue">
+                                                <h6>Settled Deals Overview</h6>
+                                            </div>
+                                            <div class="tab-inner">
+                                                <div class="tab-inner-acc">
+                                                    <apex:commandLink value="Today" id="todaySets" onclick="SetCalling('Today Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:commandLink value="This Week" id="TWSets" onclick="SetCalling('This Week Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:commandLink value="Last Week" id="LWSets" onclick="SetCalling('Last Week Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:commandLink value="This Month" id="TMSets" onclick="SetCalling('This Month Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:commandLink value="Last Month" id="LMSets" onclick="SetCalling('Last Month Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:commandLink value="This Year" id="TYSets" onclick="SetCalling('This Year Sets',id); return false;" styleClass="SetClass"/>
+                                                    <apex:actionFunction action="{!CallSettled}" name="CallSettled" reRender="SetPanel,SetStatus,SetSubStatus,searchS,SetPanel_PickDate">
+                                                        <apex:param name="WhatSet" value=""/>
+                                                    </apex:actionFunction>
+                                                    <apex:commandLink value="Pick Dates" id="PDSets" onclick="SetCalling('Pick Dates Set',id); return false;" styleClass="SetClass"/>
+                                                    <apex:actionFunction name="picDate_Click_Set" action="{!picDate_Click_Set}" reRender="SetPanel,SetStatus,SetSubStatus,searchS,SetPanel_PickDate"/>
+                                                </div>
+                                                <div class="tab-inner-acc" style="margin-top:15px;">
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <apex:selectList id="SetStatus" value="{!SetStage}" size="1" style="width:200px; margin-right:20px;" onchange="SetStageChanged(); return false;">              
+                                                                <apex:selectOptions value="{!Opp_StageAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:actionFunction action="{!dependent_Opp_Sub_Stage}" name="dependent_Set_Sub_Stage" reRender="SetSubStatus"/>
+                                                            <apex:selectList value="{!SetSubStage}" size="1" id="SetSubStatus" style="width:200px; margin-right:20px;" disabled="{!Opp_SubStageAll.size<2}">              
+                                                                <apex:selectOptions value="{!Opp_SubStageAll}"/>          
+                                                            </apex:selectList>
+                                                            <apex:commandLink action="{!filterSets}" id="SetFilter" reRender="SetPanel" status="SetSpinner" styleClass="SearchButton fa fa-filter"/>
+                                                            <apex:commandLink action="{!filterSets_cancel}" reRender="SetPanel,SetStatus,SetSubStatus" status="SetSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" rel="tooltip" data-placement="top" title="You can search based on the customers name or company name" style="color:#0a77d2; margin-right:5px;"></i>
+                                                            <apex:inputText value="{!SetSearch}" id="searchS" html-placeholder="Search Settlements" onkeypress="EnterKey(id);" style="width:200px;border-radius: 5px;border-width:1px;"/>
+                                                            <apex:commandLink action="{!SearchSet}" id="SetSearch" reRender="SetPanel" status="SetSpinner" styleClass="SearchButton fa fa-search"/>
+                                                            <apex:commandLink action="{!ClearSet}" reRender="SetPanel,searchS" status="SetSpinner" styleClass="CrossButton fa fa-close"/>
+                                                        </div></div>
+                                                    <div class="row">
+                                                        <apex:outputPanel id="SetPanel_PickDate">
+                                                            <apex:outputPanel rendered="{!PickDatesSetPAnel}">
+                                                                <div style="font-size:12px;">     
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>From <br/>
+                                                                                <apex:input type="date" value="{!startDate_Set}" /></td>
+                                                                            <td>To <br/>
+                                                                                <apex:input type="date" value="{!endDate_Set}" /> </td>
+                                                                            <td  style="padding-top:18px;">
+                                                                                <apex:commandLink action="{!picDate_Click_Set}" status="OppSpinner" value="Apply" reRender="SetPanel" styleClass="SearchButton"/>
+                                                                                <apex:commandLink action="{!Clear_picDate_Click_Set}" status="AppSpinner" value="Clear" reRender="SetPanel,SetPanel_PickDate" styleClass="closeButton"/>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </apex:outputPanel>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-content tab-deal-inner  col-sm-12">
+                                                    <apex:outputPanel id="SetPanel">
+                                                        <div class="card border-no">
+                                                            <div class="row">
+                                                                <apex:outputPanel rendered="{!Settled.size != 0}" layout="none">
+                                                                    <div class="note-record text-blue font-12 font-normal mb-2">
+                                                                        {!totalSets} Settled Deals Showing
+                                                                        {!if(WhatSet1 == 'Today Sets', 'For Today',null)}
+                                                                        <apex:outputPanel rendered="{!(WhatSet1 == 'This Week Sets')}">
+                                                                            &nbsp;For This Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!StartDate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!EndDate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatSet1 == 'Last Week Sets')}">
+                                                                            &nbsp;For Last Week (<apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                            <apex:param value="{!LastWeekSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastWeekEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatSet1 == 'This Month Sets')}">
+                                                                            &nbsp;For This Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!MonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        <apex:outputPanel rendered="{!(WhatSet1 == 'Last Month Sets')}">
+                                                                            &nbsp;For Last Month (
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthSdate}" /> 
+                                                                            </apex:outputText>&nbsp; To &nbsp;
+                                                                            <apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                <apex:param value="{!LastMonthEdate}" /> 
+                                                                            </apex:outputText>)
+                                                                        </apex:outputPanel>
+                                                                        {!if(WhatSet1 == 'This Year Sets', 'For This Year',null)}
+                                                                    </div>
+                                                                    <apex:actionStatus id="SetSpinner">
+                                                                        <apex:facet name="start">
+                                                                            <apex:outputPanel >
+                                                                                <img src="/img/loading32.gif" width="25" height="25" />
+                                                                                <apex:outputLabel value="Loading..."/>
+                                                                            </apex:outputPanel>            
+                                                                        </apex:facet>
+                                                                    </apex:actionStatus>
+                                                                    <div class="table-section">
+                                                                        <table class="table">
+                                                                            <thead><tr><th scope="col">Broker Name</th>
+                                                                                <th scope="col">Funded Date</th>
+                                                                                <th scope="col">Type</th>
+                                                                                <th scope="col">Company</th>
+                                                                                <th scope="col">Stage</th>
+                                                                                <th scope="col">Sub Stage</th>
+                                                                                <th scope="col">Loan Amount</th></tr></thead>
+                                                                            
+                                                                            <tbody>
+                                                                                <apex:variable value="{!0}" var="todayTotal"/>
+                                                                                <apex:repeat value="{!Settled}" var="today">
+                                                                                    <tr><td>{!today.Broker_Name__c}</td>
+                                                                                        <td><apex:outputText value="{0,date,MMMMM' 'dd' 'yyyy}">
+                                                                                            <apex:param value="{!today.Funded_Date__c}" /> 
+                                                                                            </apex:outputText></td>
+                                                                                        <td>{!today.Loan_Type__c}</td>
+                                                                                        <td>{!today.Account.name}</td>
+                                                                                        <td>{!today.StageName}</td>
+                                                                                        <td>{!today.Sub_stage__c}</td>
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!today.Loan_Amount__c!=null}">
+                                                                                                ${!FLOOR(today.Loan_Amount__c)}
+                                                                                                <apex:variable var="todayTotal" value="{!today.Loan_Amount__c+todayTotal}" />
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!today.Loan_Amount__c==null}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </apex:repeat>
+                                                                                
+                                                                                <apex:outputPanel layout="none">
+                                                                                    <tr><td colspan="6" style="text-align:right;">SubTotal</td> 
+                                                                                        <td>
+                                                                                            
+                                                                                            <apex:outputPanel rendered="{!todayTotal==null || todayTotal == 0}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!todayTotal!=null && todayTotal != 0}">
+                                                                                                ${!FLOOR(todayTotal)}
+                                                                                            </apex:outputPanel>
+                                                                                            
+                                                                                            
+                                                                                        </td></tr>
+                                                                                </apex:outputPanel>
+                                                                                <apex:outputPanel rendered="{!DisableNext_Set}" layout="none">
+                                                                                    <tr><td colspan="6" style="text-align:right;">Grand Total</td> 
+                                                                                        <td>
+                                                                                            <apex:outputPanel rendered="{!Final_Settled_GrandTotal==null || Final_Settled_GrandTotal == 0}">
+                                                                                                $0
+                                                                                            </apex:outputPanel>
+                                                                                            <apex:outputPanel rendered="{!Final_Settled_GrandTotal!=null && Final_Settled_GrandTotal != 0}">
+                                                                                                ${!FLOOR(Final_Settled_GrandTotal)}
+                                                                                            </apex:outputPanel>
+                                                                                        </td></tr>
+                                                                                </apex:outputPanel>
+                                                                                
+                                                                                
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div><!--Table Contene End-->
+                                                                    <!--<apex:commandButton action="{!Beginning_Set}" title="Beginning" value="<<" disabled="{!DisablePrevious_Set}" reRender="SetPanel"/>
+<apex:commandButton action="{!Previous_Set}" title="Previous" value="<" disabled="{!DisablePrevious_Set}" reRender="SetPanel"/>        
+<apex:commandButton action="{!Next_Set}" title="Next" value=">" disabled="{!disableNext_Opp}" reRender="SetPanel"/>
+<apex:commandButton action="{!End_Set}" title="End" value=">>" disabled="{!disableNext_Opp}" reRender="SetPanel"/>-->
+                                                                    <apex:commandLink action="{!Beginning_Set}" title="Beginning" value="<<" rendered="{!NOT(DisablePrevious_Set)}" reRender="SetPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!Previous_Set}" title="Previous" value="<" rendered="{!NOT(DisablePrevious_Set)}" reRender="SetPanel" styleClass="PaginationButtons"/>        
+                                                                    <apex:commandLink action="{!Next_Set}" title="Next" value=">" rendered="{!NOT(DisableNext_Set)}" reRender="SetPanel" styleClass="PaginationButtons"/>
+                                                                    <apex:commandLink action="{!End_Set}" title="End" value=">>" rendered="{!NOT(DisableNext_Set)}" reRender="SetPanel" styleClass="PaginationButtons"/>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!Settled.size == 0}">
+                                                                    <div class="nodatafound">
+                                                                        <h2>We Couldn't find any results.</h2>
+                                                                        <h4>Try adjusting your filters.</h4>
+                                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/no-resultsfound.gif')}"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                            </div><!--Card Body End-->
+                                                        </div>
+                                                    </apex:outputPanel>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--Settled  End-->
+                                        
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </section>
+                    <!--Your Snapshot End-->
+                </main>
+                <footer class="footer-main">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-3 ft ft-one">
+                                <h4 class="font-20 font-weight-bold ft-title">Useful Link</h4>
+                                <ul><li><apex:commandLink onclick="window.open('{!$Label.bPartner_HowItWorks}'); return false;" value="How It Works"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_AboutUs}'); return false;" value="About us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_PartnerUp}'); return false;" value="Partner Up"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_News}'); return false;" value="News"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ContactUs}'); return false;" value="Contact us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ApplyNow}'); return false;" value="Apply Now"/></li></ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-two">
+                                <h4 class="font-20 font-weight-bold ft-title">Location</h4>
+                                <p>Suite 4, 322 St Kilda<br/>Rd, St Kilda VIC 3182</p>
+                            </div>
+                            <div class="col-sm-3 ft ft-three">
+                                <h4 class="font-20 font-weight-bold ft-title">Get in Contact</h4>
+                                <ul><li><i class="fa fa-envelope-o" aria-hidden="true"></i> <a href="mailto:info@bizcap.com.au">info@bizcap.com.au</a></li>
+                                    <li><i class="fa fa-phone" aria-hidden="true"></i> <a href="tel:1300922233">1300-922-233</a></li></ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-five">
+                                <h4 class="font-20 font-weight-bold ft-title">Other</h4>
+                                <p>Copyright Zweb Ventures<br/>
+                                    PTY LTD (625 682 831) and <br/>
+                                    Bizcap AU Pty Ltd (54 633 927 <br/>
+                                    090) of PO Box 195, Balaclava<br/>
+                                    VIC 3183</p>
+                                <ul><li><apex:commandLink onclick="window.open('{!$Label.bPartner_Privacy_Policy}'); return false;" value="Privacy Policy"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_Terms_Of_Use}'); return false;" value="Terms of Use"/></li></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ft-bottom">
+                        <div class="container">
+                            <div class="row text-center">
+                                <h3>Connect with us:</h3>
+                                <div class="ft-social">
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_Facebook_URL}'); return false;" styleClass="fa fa-facebook"/>
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_LinkedIn_URL}'); return false;" styleClass="fa fa-linkedin"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </body> 
+        </html>
+        
+    </apex:form>
+    <script> 
+    var ParamApp;
+    var ParamOpp;
+    var ParamSet;
+    window.addEventListener("DOMContentLoaded",
+                            function() {
+                                //page title on chrome tab
+                                
+                                var pageTitle = document.getElementsByTagName("title");
+                                console.log('pageTitle'+document.title);
+                                var str = window.top.location.href;
+                                console.log('window.location.href' + str );
+                                console.log(str.includes("sfdcpage"));
+                                if(!window.top.location.hash && str.includes("sfdcpage")) {
+                                    //setting window location
+                                    window.top.location = window.top.location + '#loaded';
+                                    //using reload() method to reload web page
+                                    window.top.location.reload();
+                                }
+                                var tempValue = document.getElementById("dealspage");
+                                console.log('tempValue'+tempValue)
+                                //page title on chrome tab
+                                
+                                var whatId = '{!$CurrentPage.parameters.WhenID}';
+                                console.log(whatId);
+                                if(whatId != null && whatId != '')
+                                {
+                                    if(whatId == 'todayApp' || whatId == 'TWApp' || whatId == 'LWApp' || whatId == 'TMApp' || whatId == 'LMApp' || whatId == 'TYApp' || whatId == 'PDApp')
+                                    {
+                                        ParamApp = whatId;
+                                        var AppIcon = document.getElementById('nav-application-tab');
+                                        AppIcon.click();
+                                    }
+                                    if(whatId == 'todayOpp' || whatId == 'TWOpp' || whatId == 'LWOpp' || whatId == 'TMOpp' || whatId == 'LMOpp' || whatId == 'TYOpp' || whatId == 'PDOpp')
+                                    {
+                                        ParamOpp = whatId;
+                                        var OppIcon = document.getElementById('nav-oppor-created-tab');
+                                        OppIcon.click();
+                                    }
+                                    if(whatId == 'todaySets' || whatId == 'TWSets' || whatId == 'LWSets' || whatId == 'TMSets' || whatId == 'LMSets' || whatId == 'TYSets' || whatId == 'PDSets')
+                                    {
+                                        ParamSet = whatId;
+                                        var SetIcon = document.getElementById('nav-settled-tab');
+                                        SetIcon.click();
+                                    }
+                                    var Which_Button = document.getElementById('dealspage:dealsForm:'+whatId);
+                                    Which_Button.click();
+                                }
+                                else{
+                                    //Lead today initially called
+                                    var Leadbtn = document.getElementById('dealspage:dealsForm:todayLead');
+                                    Leadbtn.click();
+                                }
+                                
+                                return false;
+                            });
+    
+    function LeadsCalling(Status,id)
+    {
+        console.log(id)
+        if(Status == "Pick Dates Leads")
+        {
+            picDate_Click_Lead();
+        }
+        else
+        {
+            CallLeads(Status);
+        }
+        var n = document.getElementsByClassName("LeadClass");
+        console.log(n.length)
+        for (var i = 0; i < n.length; i++) {
+            n[i].style.background = 'white';
+        }
+        var btn = document.getElementById(id);
+        btn.style.background = 'rgb(225 245 255)';
+    }
+    function AppCalling(Status,id)
+    {
+        if(Status == "Pick Dates Apps")
+        {
+            picDate_Click_App();
+        }
+        else{
+            CallApps(Status);
+        }
+        var n = document.getElementsByClassName("AppClass");
+        console.log(n.length)
+        for (var i = 0; i < n.length; i++) {
+            n[i].style.background = 'white';
+        }
+        var btn = document.getElementById(id);
+        btn.style.background = 'rgb(225 245 255)';
+    }
+    function OppCalling(Status,id)
+    {
+        console.log(id)
+        if(Status == "Pick Dates Opp")
+        {
+            picDate_Click_Opp();
+        }
+        else{
+            CallOpportunity(Status);
+        }
+        var n = document.getElementsByClassName("OppClass");
+        console.log(n.length)
+        for (var i = 0; i < n.length; i++) {
+            n[i].style.background = 'white';
+        }
+        var btn = document.getElementById(id);
+        btn.style.background = 'rgb(225 245 255)';
+    }
+    function SetCalling(Status,id)
+    {
+        if(Status == "Pick Dates Set")
+        {
+            picDate_Click_Set();
+        }
+        else{
+            CallSettled(Status);
+        }
+        
+        var n = document.getElementsByClassName("SetClass");
+        console.log(n.length)
+        for (var i = 0; i < n.length; i++) {
+            n[i].style.background = 'white';
+        }
+        var btn = document.getElementById(id);
+        btn.style.background = 'rgb(225 245 255)';
+    }
+    function EnterKey(id)
+    {
+        console.log(id);
+        if (window.event && window.event.keyCode == 13) {
+            if(id == 'dealspage:dealsForm:searchL')
+            {
+                var ele=document.getElementById('dealspage:dealsForm:LeadSearch');
+                ele.click();
+            }
+            if(id == 'dealspage:dealsForm:searchA')
+            {
+                var ele=document.getElementById('dealspage:dealsForm:AppSearch');
+                ele.click();
+            }
+            if(id == 'dealspage:dealsForm:searchO')
+            {
+                var ele=document.getElementById('dealspage:dealsForm:OppSearch');
+                ele.click();
+            }
+            if(id == 'dealspage:dealsForm:searchS')
+            {
+                var ele=document.getElementById('dealspage:dealsForm:SetSearch');
+                ele.click();
+            }
+            
+            return false;
+        } 
+    }
+    var openApp; 
+    function Applications()
+    {
+        if(openApp != 'App_open' && (ParamApp == null || ParamApp == ''))
+        {
+            var App_btn = document.getElementById('dealspage:dealsForm:todayApp');
+            App_btn.click();
+            openApp = 'App_open';
+        }
+        return false;
+    }
+    var OpenOpp;
+    function Opportunity()
+    {
+        if(OpenOpp != 'Opp_open' && (ParamOpp == null || ParamOpp == ''))
+        {
+            var Opp_btn = document.getElementById('dealspage:dealsForm:todayOpp');
+            Opp_btn.click();
+            OpenOpp = 'Opp_open'
+        }
+        return false;
+    }
+    var OpenSet;
+    function Settled()
+    {
+        if(OpenSet != 'Opp_set' && (ParamSet == null || ParamSet == ''))
+        {
+            var Set_btn = document.getElementById('dealspage:dealsForm:todaySets');
+            Set_btn.click();
+            OpenSet = 'Opp_set'
+        }
+        return false;
+    }
+    function logoutuser()
+    {
+        var lout = '$A.get($Label.c.bPartner_LogOutURL)';
+        window.location.replace("{!$Site.Prefix}/secur/logout.jsp?retUrl=lout");
+    }
+    function LeadStatusChanged()
+    {
+        dependent_Lead_Sub_Stattus();
+    }
+    function AppStatusChanged()
+    {
+        dependent_App_Sub_Stattus();
+    }
+    function OppStageChanged()
+    {
+        dependent_Opp_Sub_Stage();
+    }
+    function SetStageChanged()
+    {
+        dependent_Set_Sub_Stage();
+    }
+    //ToolTip
+    
+    $( function()
+      {
+          var targets = $( '[rel~=tooltip]' ),
+              target  = false,
+              tooltip = false,
+              title   = false;
+          
+          targets.bind( 'mouseenter', function()
+                       {
+                           target  = $( this );
+                           tip     = target.attr( 'title' );
+                           tooltip = $( '<div id="tooltip"></div>' );
+                           
+                           if( !tip || tip == '' )
+                               return false;
+                           
+                           target.removeAttr( 'title' );
+                           tooltip.css( 'opacity', 0 )
+                           .html( tip )
+                           .appendTo( 'body' );
+                           
+                           var init_tooltip = function()
+                           {
+                               if( $( window ).width() < tooltip.outerWidth() * 1.5 )
+                                   tooltip.css( 'max-width', $( window ).width() / 2 );
+                               else
+                                   tooltip.css( 'max-width', 340 );
+                               
+                               var pos_left = target.offset().left + ( target.outerWidth() / 2 ) - ( tooltip.outerWidth() / 2 ),
+                                   pos_top  = target.offset().top - tooltip.outerHeight() - 20;
+                               
+                               if( pos_left < 0 )
+                               {
+                                   pos_left = target.offset().left + target.outerWidth() / 2 - 20;
+                                   tooltip.addClass( 'left' );
+                               }
+                               else
+                                   tooltip.removeClass( 'left' );
+                               
+                               if( pos_left + tooltip.outerWidth() > $( window ).width() )
+                               {
+                                   pos_left = target.offset().left - tooltip.outerWidth() + target.outerWidth() / 2 + 20;
+                                   tooltip.addClass( 'right' );
+                               }
+                               else
+                                   tooltip.removeClass( 'right' );
+                               
+                               if( pos_top < 0 )
+                               {
+                                   var pos_top  = target.offset().top + target.outerHeight();
+                                   tooltip.addClass( 'top' );
+                               }
+                               else
+                                   tooltip.removeClass( 'top' );
+                               
+                               tooltip.css( { left: pos_left, top: pos_top } )
+                               .animate( { top: '+=10', opacity: 1 }, 50 );
+                           };
+                           
+                           init_tooltip();
+                           $( window ).resize( init_tooltip );
+                           
+                           var remove_tooltip = function()
+                           {
+                               tooltip.animate( { top: '-=10', opacity: 0 }, 50, function()
+                                               {
+                                                   $( this ).remove();
+                                               });
+                               
+                               target.attr( 'title', tip );
+                           };
+                           
+                           target.bind( 'mouseleave', remove_tooltip );
+                           tooltip.bind( 'click', remove_tooltip );
+                       });
+      });
+    </script>
+</apex:page>

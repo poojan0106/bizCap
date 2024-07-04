@@ -1,0 +1,4 @@
+<apex:page controller="OAuthRestBPUController" action="{!login}">
+  <h1>Generating token...</h1>
+
+</apex:page>

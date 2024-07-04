@@ -1,0 +1,1060 @@
+<apex:page Controller="ApplicationFormController" id="pageApplicationForm" sidebar="false" showHeader="false" doctype="html-5.0">
+     <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">     
+    <!--Salesforce Lightning Design System Static Resource-->
+    <apex:stylesheet value="{!URLFOR($Resource.Lightning_SLDS, '/assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+    
+    <apex:form id="idApplicationForm">
+        
+        <apex:slds />
+        
+        <!--Google hosted jQuery LIbrary-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+        <script>
+        
+            //You need to wrap everything in document.ready because the select tag we are taregting needs to
+            //be loaded in the DOM befire we can access it.
+            $(document).ready(function() {
+                //-----EDIT THE NEXT TWO LINES-----
+                var startYear=1900; //replace 1982 with whatever year you want to start with;
+                var endYear=2034; //replace 2034 with whatever year you want to end with;
+                //-----EDIT BELLOW HERE AT YOUR OWN RISK-----
+                var optionsString='';
+                //Make sure that the endYear comes after the startYear
+                if(startYear<endYear){
+                    //Loops through each date and renders the string for an option tag and addes it to the Optrionsstring variable
+                    for(i=startYear;i<endYear+1;i++){
+                        optionsString += "<option value=\""+i+"\">"+i+"</option>";
+                    }
+                    //Replace the innerHTML of the calendar picker year select tag with the Optionsstring we constructed.
+                    $('#calYearPicker').html(optionsString);
+                }
+            });
+            
+            function displayStatus(actionName, errorElementId){
+            
+            var errorMessage = document.getElementById(errorElementId);
+
+            if(errorMessage != null && errorMessage.value != null && errorMessage.value != '' && errorMessage.value != 'success') {
+                if(errorMessage.value  == 'Please confirm you have read and understood Bizcap Privacy Policy'){
+                    $('#errorText').text('Please confirm you have read and understood Bizcap Privacy Policy');
+                    $('#backdrop').addClass('slds-backdrop--open');
+                    $('#idErrorModal').addClass('slds-fade-in-open');
+            
+                } 
+                if(errorMessage.value  == 'please fill in all mandatory fields marked with an asterisk (✶)'){
+                    $('#errorText').text('Please fill in all mandatory fields marked with an asterisk (✶)');
+                    $('#backdrop').addClass('slds-backdrop--open');
+                    $('#idErrorModal').addClass('slds-fade-in-open');
+                }
+                
+            } else if (actionName == 'SaveApplication') {
+                //Success modal Open 
+                //$('#successText').text('Application submitted successfully.');
+                //$('#backdrop').addClass('slds-backdrop--open');
+                //$('#idSuccessModal').addClass('slds-fade-in-open');
+                //refreshPage();
+                window.open('https://www.bizcap.com.au/apply-acknowledgement/','_self');
+            }
+        }
+        
+        function refreshPage(){
+              document.location.reload(true);
+        }
+        
+        </script>
+        
+        <style>
+            
+            span.dateFormat { 
+            display:none; 
+            }
+            
+            .requiredField:before{
+            content:"✱";
+            color:red   
+            }
+            
+            .slds-scope .slds-input{
+                border: 1px solid rgb(139, 141, 143);
+            }
+            
+            .slds-scope .slds-form-element__label{
+                color: rgb(46, 46, 46);
+                font-size: 0.78rem;
+            }
+        </style>
+        
+       
+             
+           
+            <apex:actionFunction name="afSaveApplication" action="{!saveApplication}" oncomplete="displayStatus('SaveApplication','{!$Component.hdnErrorMessage}');" reRender="hdnErrorMessage"/>   
+            <apex:actionFunction name="afAddOwner" action="{!addOwner}" reRender="idOwnerSection"/>   
+            <apex:actionFunction name="afDeleteOwner" action="{!deleteOwner}" reRender="idOwnerSection" immediate="true" >
+                <apex:param name="removeOwnerIndex" assignTo="{!strRemoveOwnerIndex}" value=""/>
+            </apex:actionFunction>
+            
+            <apex:inputHidden id="hdnErrorMessage" value="{!strErrorMessage}"/>  
+            
+           
+            <!-- Page header - Start-->
+            <div class="slds-page-header" role="banner">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <div class="slds-media__figure slds-icon forceEntityIcon" style="background-color: ;" data-aura-rendered-by="19:1569;a" data-aura-class="forceEntityIcon">
+                                    <span class="uiImage" data-aura-class="uiImage">
+                                        <!--<img id="imgTimesheetIcon" width="32" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/company_60.png')}" />-->
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-media__body">
+                                <apex:image id="FPIImage" value="{!$Resource.CompanyLogo}" width="200" height="200" style="margin-top:1%;"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                        <div id="interviewButtons" class="slds-button-group" role="group">
+                            <label style="color:rgba(0, 68, 135, 1);">
+                                Bizcap.com.au<br/>
+                                1300 922 223<br/>
+                        info@bizcap.com.au
+                    </label>
+                </div>
+            </div>    
+        </div>
+    </div>
+    <!-- Page header - End-->
+    
+    
+    
+    <!--The Salesforce Lightning Design System Wrapping Div with Scoping Class -->
+    
+    
+    <div class="minerva18" style="width: 98%;margin-left: 1%;margin-top: 1%;">
+        
+        <fieldset class="slds-box slds-theme--default slds-container" style="box-shadow: 0px 0px 15px -3px #094172;">
+            <legend>
+                <div class="demo-only" style="padding: 0.5rem; background: rgb(22, 50, 92);">
+                    <div class="slds-text-color_inverse">APPLICATION FORM</div>
+                </div>
+            </legend>
+            
+            <!-- Single Section Wrapper With Three SLDS Sections, The Wrapper Div Class must be 'Minerva18SectionGroupSingle' -->
+            <div class="Minerva18SectionGroupSingle" >
+                <!--SLDS Section Start-->
+                <div class="slds-section">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>1. BUSINESS INFORMATION</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="width: 49%;margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                <fieldset class="slds-form-element">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--3-of-3">
+                                                <label class="slds-form-element__label requiredField" for="legalName">Legal Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Company}" required="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--3-of-3">
+                                                <label class="slds-form-element__label requiredField" for="businessTradingName">Business/ Trading Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Business_Trading_Name__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label" for="acn">ACN</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.ACN__c}" required="false" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="anb">ABN</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.ABN__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="noofLocations">No. of Locations</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.No_of_Locations__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="website">Website</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Website}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="physicalAddress">Physical Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Physical_Address__c}" required="false" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="Suburb">Suburb</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Suburb_Physical__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="state">State</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.State_Physical__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="postCode">Post code</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Post_Code_Physical__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="physicalAddress">Mailing Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Mailing_Address__c}" required="false" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="Suburb">Suburb</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Suburb_Mailing__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="state">State</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.State_Mailing__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="postCode">Post code</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Post_Code_Mailing__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="telephoneNumber">Telephone Number</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Telephone_Number__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="fax">Fax</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Fax}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="emailAddress">Email Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Email}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label  class="slds-form-element__label color-brand-darker" for="businessEstablished">Business Established</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Business_Established__c}" required="false" />
+                                                    <!-- <apex:inputText value="{!dateBusinessEstablished}" styleClass="slds-input" size="10" id="idBusinessEst" onfocus="DatePicker.pickDate(false,'pageApplicationForm:frm:idBusinessEst', false);" />
+-->                     
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="lengthofOwnership">Length of Ownership</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Length_of_Ownership__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            
+                                              <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="amountRequested">Amount requested</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Amount_requested__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                        
+                                        
+                                        <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="monthlyRevenue">Monthly Revenue</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Monthly_Revenue__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label requiredField" for="loanPurpose">Loan Purpose</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Loan_Purpose__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                          
+                                           
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="numberOfEmployees">No. of Employees</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.NumberOfEmployees}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--3-of-3">
+                                                <label class="slds-form-element__label requiredField" for="typeofEntity">Type of Entity</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Type_of_Entity__c}" required="false" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--3-of-3">
+                                                <label class="slds-form-element__label requiredField" for="ProductsOrServicesSold">Products or Services Sold</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Products_or_Services_Sold__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--SLDS Section End-->  
+                
+                <!--
+                <div class="slds-section" style="margin-top: 1%;">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>OWNER INFORMATION Owner/ Director/ Secretary/ Partner</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="width: 49%;margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="firstName">First Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.FirstName}" required="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="requiredField" for="lastName">Last Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.LastName}" required="false"/>              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="title">Title</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Title}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="ownership%">Ownership %</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Ownership__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="homeAddress">Home Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Street}" required="false" style="height: fit-content;"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="suburb">Suburb</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Suburb_Home__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="state">State</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.State}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="postalCode">PostalCode</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.PostalCode}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="lengthatddress">Length at Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Length_at_Address__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="dateOfBirth:">Date Of Birth:</label>
+                                                <div class="slds-form-element__control">
+                                                   <apex:inputField styleClass="slds-input" value="{!objLead.Date_Of_Birth__c}" required="false" />
+                                                    <apex:inputText value="{!strDateOfBirth}" styleClass="slds-input" size="10" id="idDob" onfocus="DatePicker.pickDate(false,this, false);" />
+                                                   
+                                               </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="email">Email</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Email}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="telW">Tel (W)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Phone}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="telM">Tel (M)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.MobilePhone}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                 -->
+                                 <div class="slds-section" style="margin-top: 1%;margin-bottom: -1.5%;">
+                                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                                        <button class="slds-button slds-section__title-action">
+                                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                            </svg>OWNER INFORMATION Owner/ Director/ Secretary/ Partner</button>
+                                    </h2>
+                                    <apex:outputPanel id="idOwnerSection"> 
+                                      
+                                    <br></br>
+                                    <!--
+                                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">{!count} OWNER INFORMATION Owner/ Director/ Secretary/ Partner</h2>
+                                    <br></br>
+                                    -->
+                                    <div class="slds-section__content">
+                                   
+                                    <apex:variable var="count" value="{!-1}"/>
+                                    <apex:repeat value="{!listOwnerDetails}" var="objOwner">
+                                        <apex:variable var="count" value="{!count+1}"/>
+                                        <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                                         <apex:outputText rendered="{!count != 0}"> OWNER {!count + 1}</apex:outputText>
+                                         <apex:outputText rendered="{!count == 0}"> OWNER 1</apex:outputText>
+                                         <apex:outputPanel rendered="{!count != 0}">
+                                         <button class="slds-button" id="{!count}" onClick="afDeleteOwner(this.id);return false;" title="Delete Owner">
+                                        
+                                 <img id="imgDeleteOwner" width="27" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/delete_60.png')}" /> 
+                                 </button>
+                                 </apex:outputPanel>
+                                         </h2>
+                                        <br></br>
+                                    <div style="width: 49%;margin-left: 1%;">
+                                        <div class="slds-form slds-form_compound">
+                                    <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="firstName">First Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Name}" required="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="lastName">Last Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Last_Name__c}" required="false"/>              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="title">Title</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Title__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="ownership%">Ownership %</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Ownership__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label requiredField" for="homeAddress">Home Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Home_Address__c}" required="false" style="height: fit-content;"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label requiredField" for="suburb">Suburb</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Suburb__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label requiredField" for="state">State</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.State__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label requiredField" for="postalCode">PostalCode</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Postal_Code__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label requiredField" for="lengthatddress">Length at Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Length_at_Address__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                           
+                                                <label class="slds-form-element__label requiredField" for="dateOfBirth:">Date Of Birth:</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Date_Of_Birth__c}" required="false" />
+                                                    <!--<apex:inputText value="{!strDateOfBirth}" styleClass="slds-input" size="10" id="idDob" onfocus="DatePicker.pickDate(false,this, false);" />-->
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="email">Email</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Email__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label" for="telW">Tel (W)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Tel_W__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label requiredField" for="telM">Tel (M)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Tel_M__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--4-of-4">
+                                           
+                                                <label class="slds-form-element__label requiredField" for="dateOfBirth:">Are you a Politically Exposed Person?</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objOwner.Are_you_a_Politically_Exposed_Person__c}" required="false" />
+                                                </div><br></br>
+                                                <label class="slds-form-element__label color-brand-darker">A Politically Exposed Person includes a head of state or government, government minister or senior politician, senior government official, judge, governor of a central bank or any other person who holds a position of influence with a reserve bank, senior foreign representative, high ranking member of the armed forces or board chair or senior executive of a state owned enterprise or the immediate family member or associate of any such persons.</label>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                </div>
+                                
+                                </div>
+                                 <br></br>
+                                  </apex:repeat>
+                                 
+                                   <button class="slds-button" onClick="afAddOwner(); return false;" style="margin-bottom: 2%;"> 
+                                 <img id="imgAddOwner" width="35" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/new_60.png')}" /> 
+                                 </button>
+                                 <label>Add Owner</label>
+                                </div>
+                                
+                              
+                                
+                                </apex:outputPanel>
+                                </div>
+                                
+                                
+                                
+                                <!--<button class="slds-button slds-button--brand slds-m-top--small" style="background-color: rgb(22, 50, 92);border-color: rgb(22, 50, 92);" onClick="afAddOwner(); return false;">Add Owner</button>-->
+                             
+                          
+                <!--
+                <div class="slds-section" style="margin-top: 1%;">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>OWNER INFORMATION Owner/ Director/ Secretary/ Partner</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="width: 49%;margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="firstName">First Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.First_Name__c}" required="false" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="lastName">Last Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Last_Name__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="title">Title</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Title__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="ownership%">Ownership %</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Ownership_Owner__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="homeAddress">Home Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Home_Address_Owner__c}" required="false" style="height: fit-content;"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="suburb">Suburb</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Suburb_owner__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="state">State</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.State_Owner__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="postalCode">PostalCode</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Post_Code_owner__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="lengthatddress">Length at Address</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Length_at_Address_owner__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="dateOfBirth:">Date Of Birth:</label>
+                                                <div class="slds-form-element__control">
+                                                    
+                                                    <apex:inputText value="{!strDateOfBirthOwner}" styleClass="slds-input" size="10" id="idDobOwner" onfocus="DatePicker.pickDate(false, this , false);" />
+                                                  
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="email">Email</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Email__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="telW">Tel (W)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Tel_W__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-4">
+                                                <label class="slds-form-element__label color-brand-darker" for="telM">Tel (M)</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Tel_M__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+                <div class="slds-section" style="margin-top: 1%;">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>3. BUSINESS PROPERTY INFORMATION</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="width: 49%;margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="landlord/Mortgage">Landlord/Mortgage</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Landlord_Mortgage__c}" required="false" style="height: fit-content;"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="contact/Account">Contact/Account #</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Contact_Account__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="phone">Phone</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Phone_BussProp__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="monthlyRent">Monthly Rent</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Monthly_Rent__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--2-of-5">
+                                                <label class="slds-form-element__label color-brand-darker" for="timeRemaining">Time Remaining on Lease/Mortgage</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Time_Remaining_on_Lease_Mortgage__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                <div class="slds-section" style="margin-top: 1%;">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>4. BUSINESS TRADE REFERENCES</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="width: 49%;margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="businessName">Business Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Business_Name_1__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="contactAccoutNo">Contact/ Account No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Contact_Account_No_1__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="phoneNo">    Phone No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Phone_No_1__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="businessName">Business Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Business_Name_2__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="contactAccoutNo">Contact/ Account No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Contact_Account_No_2__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="phoneNo">    Phone No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Phone_No_2__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="businessName">Business Name</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Business_Name_3__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="contactAccoutNo">Contact/ Account No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Contact_Account_No_3__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <label class="slds-form-element__label color-brand-darker" for="phoneNo">    Phone No</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField styleClass="slds-input" value="{!objLead.Phone_No_3__c}" required="false" />              
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                   <div class="slds-section" style="margin-top: 1%;">
+                    <h2 class="slds-section__title_small" style="color:rgba(0, 68, 135, 1);">
+                        <button class="slds-button slds-section__title-action">
+                            <svg aria-hidden="true" class="slds-section__title-action-icon slds-button__icon slds-button__icon--left">
+                                <use xlink:href="{!$Resource.Lightning_SLDS}/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                            </svg>5. Authorization</button>
+                    </h2>
+                    <div class="slds-section__content">
+                        <div style="margin-left: 1%;">
+                            <div class="slds-form slds-form_compound">
+                                
+                                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <label class="slds-form-element__label color-brand-darker" for="businessName" >
+                                                Authorization“By agreeing below I/We certify the above information is true and correct as set forth in this Application. Privacy Act 1988: The Applicant and each Owner named above hereby expressly and irrevocably Zwab Ventures PTY LTD t/a Bizcap, its agents and group of companies (“Us/Our”) to undertake such reasonable enquiries as they deem necessary from time to time for identity validation and credit checking purposes. Such checks may include (but not limited to) the contacting of a parties bankers, any trade references supplied, credit provider or credit reporting/scoring agencies including personal credit and consumer credit information and Land Data/property inquiries and name searches (hereinafter called “the Sources”). This list is not intended to be exhaustive. The Applicant and each Owner hereby expressly authorises the Sources to disclose to US such information concerning the Applicant and each Owner which is within their possession. Any information provided by the Sources maybe disclosed to any credit reference/report agency or any interested party subject to the terms of Our Privacy Policy which can be obtained upon request.”
+                                                </label>
+                                               
+                                            </div>
+                                            </div>
+                                         </div>  
+                                </fieldset> 
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <fieldset class="slds-form-element" style="">
+                                    <div class="slds-form-element__group">
+                                        <div class="slds-form-element__row">
+                                            
+                                            <div class="slds-form-element slds-size--4-of-6">
+                                                <apex:inputField styleClass="slds-checkbox" value="{!objLead.Application_Confirmed__c}" required="false" />              
+                                                <label class="slds-form-element__label color-brand-darker" for="confirmApp" style="font-size: 13px;color:#ca817e;">Please confirm you have read and understood Bizcap's  <apex:outputLink value="https://www.bizcap.com.au/privacy-policy/" target="_blank"> Privacy Policy</apex:outputLink></label>
+                                                <div class="slds-form-element__control"> 
+                                                    
+                                                </div>
+                                            </div>
+                                           
+                                        </div> 
+                                    </div>
+                                </fieldset> 
+            </div>
+            <!-- Single Section Wrapper End-->
+        </fieldset>
+        
+        
+        
+        </div>
+       
+        <center>
+            <button class="slds-button slds-button--brand slds-m-top--small" style="background-color: rgb(22, 50, 92);border-color: rgb(22, 50, 92);" onClick="afSaveApplication(); return false;">Save Application</button>
+        </center>
+        
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="idSuccessModal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <img id="imgSuccessIcon" width="32" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/success_60.png')}" />
+                    <span id="model-header">Success</span>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" style="text-align: center;">
+                    <div id="successText"></div>
+                </div>
+                <footer class="slds-modal__footer" style="text-align: center;">
+                    <button type="button" id="scanButton" onClick="$('#idSuccessModal').removeClass('slds-fade-in-open');$('#backdrop').removeClass('slds-backdrop--open');" class="slds-button slds-button--neutral" value="Close" title="Close">
+                        <img id="imgClose" width="22" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/close_60.png')}" />
+                    </button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop" id="backdrop"></div>
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="idErrorModal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <img id="imgErrorIcon" width="32" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/error_60.png')}" />
+                    <span id="model-header">Error</span>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" style="text-align: center;">
+                    <div id="errorText" style="font-size: larger;color: red;"></div>
+                </div>
+                <footer class="slds-modal__footer" style="text-align: center;">
+                    <button type="button" id="scanButton" onClick="$('#idErrorModal').removeClass('slds-fade-in-open');$('#backdrop').removeClass('slds-backdrop--open');" class="slds-button slds-button--neutral" value="Close" title="Close">
+                        <img id="imgClose" width="22" src="{!URLFOR($Resource.Lightning_SLDS, '/assets/icons/utility/close_60.png')}" />
+                    </button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop" id="backdrop"></div>
+        
+        <script>
+        /*SLDS Sections*/
+        $('.slds-section__content').hide();
+        $('.slds-section__title_small').find('button').find('svg').css('transition', '0.3s');
+        $('.slds-section__title_small').click(function(){
+            if($(this).parent().parent().hasClass('Minerva18SectionGroupSingle')){
+                if($(this).parent().hasClass('slds-is-open')){
+                    $(this).parent().removeClass('slds-is-open');
+                    $(this).parent().find('.slds-section__content').hide();
+                    return false;
+                }
+                else{
+                    $(this).parent().parent().find('.slds-section').removeClass('slds-is-open');
+                    $(this).parent().parent().find('.slds-section__content').hide();
+                    $(this).parent().toggleClass('slds-is-open');
+                    $(this).parent().find('.slds-section__content').show();
+                    return false;
+                }    
+            }
+            else{
+                $(this).parent().toggleClass('slds-is-open');
+                if($(this).parent().hasClass('slds-is-open')){
+                    $(this).parent().find('.slds-section__content').show();
+                }else{
+                    $(this).parent().find('.slds-section__content').hide();
+                }
+                return false;
+            }
+        });
+        /*SLDS Sections*/
+        </script>
+    
+        </apex:form>
+    </html>
+</apex:page>

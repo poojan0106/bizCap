@@ -1,0 +1,175 @@
+<apex:page id="page" controller="bPartner_LoginController" lightningStylesheets="false" standardStylesheets="false" showHeader="false" sidebar="false">
+    <apex:form id="form">
+        <style>
+            .cnt-lgn li i {
+            font-size: 24px;
+            margin-right: 10px;
+            position: relative;
+            padding-left: 13px;
+            top: 2px;
+            }
+            .messageCell
+            {
+            font-size: 13px;
+            color: #cc0000;
+            }
+        </style>
+        <html lang="en">
+            <head>
+                <title>Login</title><!-- Bootstrap core CSS -->
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <meta name="generator" content="" />
+                
+                <!-- Custom styles for this template -->
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+                <!--font-family: 'Montserrat', sans-serif;-->
+                
+            </head>
+            <body id="top-body">
+                <!--Header End-->
+                
+                
+                <main role="main" class="main-part">
+                    
+                    <section class="login-section">
+                        <div class="container-fluid">
+                            <div class="row align-items-center align-content-stretch">
+                                <div class="col-sm-5 login-left d-flex justify-content-end text-right align-items-center" style="background-image:url({!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/stock-06.jpg')})">
+                                    <div class="login-left d-flex flex-column align-items-center justify-content-center">
+                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/login-logo.png')}"/>
+                                        <div class="cnt-lgn  flex-wrap">
+                                            <ul class="d-flex text-white">
+                                                <li><i class="fa fa-phone" aria-hidden="true"></i>1300 922 223</li>
+                                                <li><i class="fa fa-envelope-o" aria-hidden="true"></i>info@bizcap.com.au</li>
+                                            </ul>
+                                        </div>
+                                        <div class="lngsocial flex-wrap">
+                                            <p>Connect with us:</p>
+                                            <ul class="d-flex">
+                                                <li><apex:commandLink onclick="window.open('{!$Label.bPartner_Facebook_URL}'); return false;" styleClass="fa fa-facebook"/></li>
+                                                <li><apex:commandLink onclick="window.open('{!$Label.bPartner_LinkedIn_URL}'); return false;" styleClass="fa fa-linkedin"/></li>
+                                            </ul>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-6 login-right">
+                                    <div class="login-right pl-3">
+                                        <h2>Login to your account</h2>
+                                        
+                                        <div class="login-form">
+                                            
+                                            <div class="input-group relative">
+                                                <apex:inputText id="email" value="{!email}" styleclass="line-control" html-placeholder="UserName" html-aria-label="UserName" onblur="checkEmail();"/>
+                                                <div id="emailErr" style="color:red; font-size: 13px;"></div>
+                                                <div class="input-group-prepend">
+                                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="input-group relative">
+                                                <apex:inputSecret id="password" value="{!password}" styleclass="line-control" html-placeholder="Password" html-aria-label="password" onkeyup="checkpass();"/>
+                                                <div id="passErr" style="color:red; font-size: 13px;"></div>
+                                                <div class="input-group-prepend">
+                                                    <i class="fa fa-lock" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                            <div class="rem-forgt d-flex justify-content-between align-content-stretch">
+                                                <div class ="messageCell">
+                                                    <apex:pageMessages id="errmsg"></apex:pageMessages>
+                                                </div>
+                                                <!--<div class="custom-control custom-checkbox">
+                                                    <apex:inputCheckbox value="{!remember}" styleclass="custom-control-input" id="rememberme"/>
+                                                    <label class="custom-control-label" for="rememberme">Remember me</label>
+                                                </div>-->
+                                                <div class="forgotpassurl">
+                                                    <!--<apex:commandLink onclick="window.open('{!$Label.bPartner_forgotPasswordURL}'); return false;" value="Forgot password?"/>-->
+                                                    <apex:outputLink value="{!$Label.bPartner_forgotPasswordURL}" target="_self">Forgot password?</apex:outputLink>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="frmbtn">
+                                                <apex:commandButton value="Login" onclick="login(); return false;" styleclass="btn btn-border"/>
+                                                <apex:actionFunction action="{!loginAction}" name="loginaction" reRender="errmsg"/>
+                                            </div>
+                                            <div class="frmnote">
+                                                <p>Should you need assistance or if you'd like to be set<br/>
+                                                    up as a partner please fill in the form found <a href="{!$Label.PartnerUp}" target="_blank" class="plain-btn text-blue">here</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                </main>
+                <script>
+                function checkEmail()
+                {
+                    console.log('check Email');
+                    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
+                    var email = document.getElementById("page:form:email").value;
+                    console.log(email.length);
+                    if(email.length != 0) 
+                    {
+                        if(!email.match(mailformat))
+                        {
+                            //document.getElementById("emailErr").innerHTML = 'Invalid Email';
+                        }
+                        else
+                        {
+                            document.getElementById("emailErr").innerHTML = '';
+                        }
+                    }
+                    else
+                    {
+                        document.getElementById("emailErr").innerHTML = '';
+                    }
+                }
+                function checkpass()
+                {
+                    var password = document.getElementById("page:form:password").value;
+                    if(password.length == 0)
+                    {
+                        document.getElementById("passErr").innerHTML = 'Please Enter Password';
+                    }
+                    else
+                    {
+                        document.getElementById("passErr").innerHTML = ' ';
+                    }
+                }
+                function login()
+                {
+                    var bool = true;
+                    var email = document.getElementById("page:form:email").value;
+                    var password = document.getElementById("page:form:password").value;
+                    if(email.length == 0)
+                    {
+                        bool = false;
+                        document.getElementById("emailErr").innerHTML = 'Please Enter Username';
+                    }
+                    if(password.length == 0)
+                    {
+                        bool = false;
+                        document.getElementById("passErr").innerHTML = 'Please Enter Password';
+                    }
+                    if(bool == true)
+                    {
+                        loginaction();
+                    }
+                }
+                </script>     
+            </body> 
+        </html>
+    </apex:form>
+</apex:page>

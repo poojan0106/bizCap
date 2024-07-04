@@ -1,0 +1,609 @@
+<apex:page id="page" controller="bPartner_SubmitLeadController" lightningStylesheets="false" standardStylesheets="false" showHeader="false" sidebar="false" applyBodyTag="false" docType="html-5.0">
+    
+    <html lang="en">
+        <head>
+            <title>Submit a Lead</title><!-- Bootstrap core CSS -->
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+            <meta name="description" content="" />
+            <meta name="author" content="" />
+            <meta name="generator" content="" />
+
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"/>
+            <script src=" http://malsup.github.io/jquery.blockUI.js" />    
+               
+                
+            <!-- include jQuery -->
+            <!-- Custom styles for this template -->
+            <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+            <!--font-family: 'Montserrat', sans-serif;-->
+            
+            <script src="dist/js/jquery.min.js"></script>
+            <script src="dist/js/bootstrap.min.js"></script>
+            <script src="dist/js/popper.min.js"></script>
+            <script>window.jQuery || document.write('<script src="js/vendor/jquery.slim.min.js"><\/script>')</script>
+            <script src="dist/Chart.js/chartjs.init.js"></script>
+            <script src="dist/Chart.js/Chart.min.js"></script>
+                <apex:includeScript value="https://code.jquery.com/jquery-2.2.4.js"/>
+
+        </head>
+        <body id="top-body">
+            <!--Header End-->
+            
+            <apex:form id="form">
+                
+                
+                <main role="main" class="main-part">
+                    
+                    <section class="submitlead-section">
+                        <div class="container-fluid">
+                            <div class="row align-items-center align-content-stretch">
+                                <div class="col-sm-5 leadsubmleft login-left d-flex justify-content-end text-right align-items-end" style="background-image:url({!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/stock-05.jpg')}">
+                                    <div class="text-shadow login-left d-flex flex-column align-items-end justify-content-center">
+                                        <div class=" flex-wrap lnglogo">
+                                            <a class="nav-link" href="{!$Label.bPartner_HomeURL}" target="_top">
+                                                <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/login-logo.png')}"/>
+                                            </a>
+                                        </div>
+                                        <div class="sumleftttct text-whites flex-wrap">
+                                            <h3>We provide quick decisions and can<br/> arrange fast funding for your clients</h3>
+                                            <p>If you have a scenario you're not sure about or a<br/>customer who requires funding in under 3 hours</p>
+                                        </div>
+                                        
+                                        <div class="cnt-lgn  flex-wrap">
+                                            <h3>Please call or email us</h3>
+                                            <ul class="d-flex text-white">
+                                                <li><a href="tel:1300922223"><i class="fa fa-phone" aria-hidden="true"></i>1300 922 223</a></li>
+                                                <li><a href="mailto:info@bizcap.com.au"><i class="fa fa-envelope-o" aria-hidden="true"></i>info@bizcap.com.au</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="lngsocial flex-wrap">
+                                            <p>Connect with us:</p>
+                                            <ul class="d-flex">
+                                                <li><apex:commandLink onclick="window.open('{!$Label.bPartner_Facebook_URL}'); return false;" styleClass="fa fa-facebook"/></li>
+                                                <li><apex:commandLink onclick="window.open('{!$Label.bPartner_LinkedIn_URL}'); return false;" styleClass="fa fa-linkedin"/></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-7 login-right" id="hlead">
+                                    <div class="login-right pl-3">
+                                        <h2>Submit a Lead</h2>
+                                        
+                                        <div class="submlead-form row">
+                                            <div class="col-sm-6">
+                                                <div class="input-group relative">
+                                                    <apex:inputText value="{!firstname}" styleclass="line-control" html-placeholder="First Name"/>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-user.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="lastname" value="{!lastname}" styleclass="line-control" html-placeholder="Last Name *"/>
+                                                    <div id="lastnameErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-user.png')}"/>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="input-group relative">
+                                                    <!--<apex:inputText id="mobilenumber" value="{!mobile_number}" styleclass="line-control" html-placeholder="Mobile Number" onkeyup="checknum();" onblur="checkLength();"/>-->
+                                                    <apex:inputText id="mobilenumber" value="{!mobile_number}" styleclass="line-control" html-placeholder="Mobile Number"/>
+                                                    <div id="mobilenumberErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-mobile.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="email" value="{!email}" styleclass="line-control" html-placeholder="Email Address" onblur="checkEmail();"/>
+                                                    <div id="emailErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-email.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText value="{!phy_state}" styleclass="line-control" html-placeholder="Physical State"/>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-pstate.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText value="{!notes}" styleclass="line-control" html-placeholder="Notes"/>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-note.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size: small;">
+                                                    <apex:inputCheckbox value="{!CallBroker}" id="CallBroker" style="zoom: 125%;"/>&nbsp;If you want us to contact you about this deal instead of the client please check this box.
+                                                </div>
+                                                
+                                            </div>
+                                            
+                                            <div class="col-md-6 col-sm-7 col-xs-12" style="padding-bottom: 12px;">
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="companyname" value="{!company_name}" styleclass="line-control" html-placeholder="Company Name *"/>
+                                                    <div id="companynameErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-office.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="abn" value="{!abn}" styleclass="line-control" html-placeholder="ABN" onblur="checkABN();"/>
+                                                    <div id="abnErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-office.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="amount" value="{!amount_needded}" styleclass="line-control" html-placeholder="Amount Needed ($)" onkeyup="checknum();"/>
+                                                    <div id="amountErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-amount.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:inputText id="turnover" value="{!avg_monthly_turnover}" styleclass="line-control" html-placeholder="Avg Monthly Turnover ($)" onkeyup="checknum();"/>
+                                                    <div id="turnoverErr" style="color:red; font-size: 13px;"></div>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-avg.png')}"/>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="input-group relative">
+                                                    <apex:inputText value="{!document_Id}" styleclass="line-control" html-placeholder="Document ID"/>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-doc.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group relative">
+                                                    <apex:selectList size="1" styleClass="line-control" style="color: #6c757d; margin-top: 2px;" id="indtry" value="{!Industry}">
+                                                        <apex:selectOptions value="{!Industry_Pick}"/>
+                                                    </apex:selectList>
+                                                    <div class="input-group-prepend">
+                                                        <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/icon-state.png')}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="uploadfle">
+                                                <input type= "file"  id="HTMLfiles"  multiple="multiple" />
+                                                
+                                                </div>
+                                                
+                                            </div>
+                                            
+                                            
+                                            <apex:actionFunction name="saveFileAF" 
+                                                                 action="{!saveFile}" oncomplete="uploadFiles(); return false;"  rerender="loadtheblock"  status="uploading">                                               
+                                            </apex:actionFunction>
+                                                <apex:pageblock id="loadtheblock">
+                                            <script>
+                                               var validfiles = 'false'; 
+                                            function uploadFiles(){
+                                                // document.getElementById("spinner").style.display = "block";
+                                                var PARENT_ID = '{!MYLeadId}'; //change Id to your record Id
+                                                console.log('PARENT_ID N:::'+PARENT_ID);
+                                                var HTMLF = document.getElementById('HTMLfiles');
+                                                console.log('HTMLF : ' + HTMLF.files.length);
+                                                var count = HTMLF.files.length;
+                                                if(count>0)
+                                                {
+                                                    
+                                                        for (var i = 0; i < HTMLF.files.length; i++) {
+                                                            validfiles  ='true';
+                                                            uploading += 1;
+                                                            upload_file(count,HTMLF.files[i], PARENT_ID, function(err, res){ 
+                                                                if (uploading === uploaded){
+                                                                    console.log('uploaded'); //your operation once finish
+                                                                    //alert('upload completed');
+                                                                    //document.getElementById("spinner").style.display = "none";
+                                                                        
+                                                                        document.getElementById("hlead").style.display = 'none';
+                                                                        document.getElementById("hp").style.display = 'block';
+                                                                        waitCloseFunction2();
+
+                                                                }
+                                                            })
+                                                        }
+                                                        
+                                                    }
+                                               /* else
+                                                {
+                                                    document.getElementById("hlead").style.display = 'none';
+                                                    document.getElementById("hp").style.display = 'block';
+                                                    waitCloseFunction2();
+                                                  }*/
+                                                //
+                                            }
+                                            
+                                            </script>
+                                             </apex:pageblock>
+                                            <!--apex:actionStatus id="uploading" >
+                                                <apex:facet name="start" >
+                                                    <img src="/img/loading.gif" />                    
+                                                </apex:facet>
+                                            </apex:actionStatus>    
+                                            <div id="spinner" style="display: none">
+                                                <div class="spinner-grow text-primary"></div>
+                                                    <div class="spinner-border text-primary"></div>
+                                            </div-->
+                                               
+                                            <div style="margin-top:20px;">
+                                                <p style="font-size: small;">
+                                                    When attaching multiple files please note you need to upload them all at once, not individually. If you need to send additional files after submission please email deals@bizcap.com.au and reference the Company Name.
+                                                </p>
+                                            </div>
+                                            <div class="frmbtn">
+                                                <a class="btn btn-border" href="{!$Label.bPartner_HomeURL}" target="_top">Cancel</a>
+                                                <apex:commandButton onclick="insertingLead(); return false;" value="Submit" styleClass="btn btn-border"/>
+                                                <!--<input type="button" value="Submit" onclick="uploadFiles(); return false;" class="btn btn-border" />-->
+                                                <!--<apex:commandLink onclick="submit(); return false;" value="Submit" styleClass="btn btn-border"/>-->
+                                            </div>  
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-sm-6 login-right" id="hp" style="display: none;">
+                                    <h4>The lead is submitted successfully.</h4><br/>
+                                    <a href="{!$Label.bPartner_HomeURL}" class="btn btn-border">HOME</a>
+                                    <div class="login-right pl-3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </apex:form>
+        </body>
+        <script type="text/javascript">
+        var Inserted = false;
+        var invalid = false;
+        function checkEmail()
+        {
+            console.log('check Email');
+            var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
+            var email = document.getElementById("page:form:email").value;
+            console.log(email.length);
+            if(email.length != 0) 
+            {
+                if(!email.match(mailformat))
+                {
+                    invalid = true;
+                    document.getElementById("emailErr").innerHTML = 'Invalid Email';
+                }
+                else
+                {
+                    invalid = false;
+                    document.getElementById("emailErr").innerHTML = '';
+                }
+            }
+            else
+            {
+                document.getElementById("emailErr").innerHTML = '';
+            }
+        }
+        var maxStringSize = 6000000;
+        var attachmentList;
+        var j;
+        var count = 0;
+
+        function insertingLead()
+        {
+            console.log('called this insertingLead');
+            var bool = true;
+            var lastname = document.getElementById("page:form:lastname").value;
+            var companyname = document.getElementById("page:form:companyname").value;
+            //var attachmentbodybase64;
+            var name;
+            //input = document.getElementById('fileinput');
+            //attachmentList = input.files;
+            //var file;
+            /* if(attachmentList.length != 0)
+            {
+                if(j == undefined) 
+                j = 0;   
+                if(j < attachmentList.length)
+                {
+                    file = attachmentList[j];
+                    name = file.name;
+                    var reader = new FileReader();  
+                    reader.onload = function(e) {  
+                        attachmentbodybase64 = window.btoa(reader.result)
+                        console.log(attachmentbodybase64.length);
+                        console.log(attachmentbodybase64);
+                        if(attachmentbodybase64.length > maxStringSize )
+                            alert("File size is too large to handle");
+                        else
+                        {
+                            j++;
+                            console.log('count :'+ count);
+                            if(count == 0)
+                            {
+                                console.log('in submit');
+                                if (lastname.length == 0) 
+                                {
+                                    bool = false;
+                                    document.getElementById("lastnameErr").innerHTML = 'Last Name is Mandatory.';
+                                }
+                                if (companyname.length == 0) 
+                                {
+                                    bool = false;
+                                    document.getElementById("companynameErr").innerHTML = 'Company Name is Mandatory.';
+                                }
+                                if(bool == true && invalid == false)
+                                {
+                                    saveFileAF('yes',attachmentbodybase64, name);
+                                    count = 1;
+                                }
+                            }
+                            else
+                            {
+                                saveFileAF('no',attachmentbodybase64, name);
+                            }
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                }
+                else
+                {
+                    console.log('this is end');
+                    /*var url = window.location.origin + '/'+"{!$CurrentPage.parameters.Id}";
+            console.log(url);
+            window.location.href = url;*/
+            /* document.getElementById("hlead").style.display = 'none';
+                    document.getElementById("hp").style.display = 'block';
+                }
+        }*/
+            // else{
+            // if(Inserted==false){
+                    if (lastname.length == 0) 
+                    {
+                        bool = false;
+                        document.getElementById("lastnameErr").innerHTML = 'Last Name is Mandatory.';
+                    }
+                    if (companyname.length == 0) 
+                    {
+                        bool = false;
+                        document.getElementById("companynameErr").innerHTML = 'Company Name is Mandatory.';
+                    }
+                    console.log('bool'+bool)
+                    console.log('invalid'+invalid)
+                    if(bool == true && invalid == false)
+                    {
+                        console.log('totalfilesize: ' + totalfilesize);
+                        if(totalfilesize > 20000000)
+                            {
+                               alert("File size is too large to handle");
+                            }
+                        else
+                            {
+                                console.log('ActionFunction called')
+                                
+                                saveFileAF();
+                                waitFunction();
+                                 if(globalCount==0)
+                                {
+                                    document.getElementById("hlead").style.display = 'none';
+                                    document.getElementById("hp").style.display = 'block';
+                                    waitCloseFunction2();
+                                }
+                                //uploadFiles();
+                                
+                            }
+                        // Inserted = true;
+                    }
+            
+                    
+            // }
+//else{
+            // document.getElementById("hlead").style.display = 'none';
+            // document.getElementById("hp").style.display = 'block';
+//}
+                //            }
+            
+            
+        }
+        
+        function checkABN()
+        {
+            console.log('check mob num');
+            var ABN = document.getElementById("page:form:abn").value;
+            console.log(ABN);
+            if(ABN.length != 0) 
+            {
+                if(ABN.length < 11 || ABN.length > 11)
+                {
+                    document.getElementById("abnErr").innerHTML = '11 Digits';
+                }
+                else
+                {
+                    document.getElementById("abnErr").innerHTML = '';
+                }
+            }
+            else
+            {
+                document.getElementById("abnErr").innerHTML = '';
+            }
+        }
+        
+        function checkLength()
+        {
+            console.log('check mob num');
+            var mobilenumber = document.getElementById("page:form:mobilenumber").value;
+            console.log(mobilenumber);
+            if(mobilenumber.length != 0) 
+            {
+                if(mobilenumber.length < 10 || mobilenumber.length > 10)
+                {
+                    document.getElementById("mobilenumberErr").innerHTML = '10 Digits';
+                }
+                else
+                {
+                    document.getElementById("mobilenumberErr").innerHTML = '';
+                }
+            }
+            else
+            {
+                document.getElementById("mobilenumberErr").innerHTML = '';
+            }
+        }
+        
+        function checknum()
+        {
+            var amount = document.getElementById("page:form:amount").value;
+            var mobilenumber = document.getElementById("page:form:mobilenumber").value;
+            var turnover = document.getElementById("page:form:turnover").value;
+            
+            if (isNaN(amount)) {
+                document.getElementById("amountErr").innerHTML = 'Amount should be Number only.';
+                document.getElementById("page:form:amount").value = '';
+            }
+            else{
+                document.getElementById("amountErr").innerHTML = " ";
+            }
+            
+            if (isNaN(mobilenumber)) {
+                document.getElementById("mobilenumberErr").innerHTML = 'Mobile should be Number only.';
+                document.getElementById("page:form:mobilenumber").value = '';
+            }
+            else{
+                document.getElementById("mobilenumberErr").innerHTML = " ";
+            }
+            
+            if (isNaN(turnover)) {
+                document.getElementById("turnoverErr").innerHTML = 'TurnOver should be Number only.';
+                document.getElementById("page:form:turnover").value = '';
+            }
+            else{
+                document.getElementById("turnoverErr").innerHTML = " ";
+            }
+        }
+
+
+        var uploading = 0;
+        var uploaded = 0;
+            var uploadcount=0;
+                        var asId = "{!$Api.Session_ID}";
+
+        var upload_file = function(count,file, parentId, callback) {
+            filetoBase64(file, function(err, content){
+                var attachment_object = {
+                    parentId:parentId,
+                    Body: content, 
+                    Name: file.name, 
+                    ContentType: file.type
+                };
+                //console.log(attachment_object);
+            //console.log(JSON.stringify(attachment_object));
+                    //console.log('hello from portal : ' + asId);
+                $.ajax({
+                    url: '{!$Site.Prefix}/services/data/v39.0/sobjects/Attachment',
+                    data: JSON.stringify(attachment_object),
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    headers: {'Authorization': 'Bearer {!$Api.Session_ID}', 'Content-Type': 'application/json'},
+                    xhr: function(){
+                    
+                        var xhr = new window.XMLHttpRequest();
+                        //Upload progress
+                        xhr.upload.addEventListener("progress", function(evt){
+                            if (evt.lengthComputable) {
+                                //console.log('evt.lengthComputable: ' + evt.lengthComputable);
+                                var percentComplete = evt.loaded / evt.total;
+                                var percentComplete2 = ((evt.loaded / evt.total) * 100);
+                                //console.log('percentComplete ' + percentComplete2);
+                                //Do something with upload progress
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function(response) {
+                        uploaded += 1;
+                        uploadcount+=1;
+                        console.log(response);
+                        // the id of the attachment
+                        callback(null, true)
+                    },
+                    error: function (request, status, error) {
+                    //console.log(request.responseText);
+                    //console.log(status);
+                    //console.log('princee : ' + error);
+                   
+                }
+                });
+            })
+        }
+        
+        var filetoBase64 = function(file, callback){
+            var reader = new FileReader();
+            reader.onload = function() {
+                //attachmentbodybase64 = window.btoa(reader.result)
+                //console.log(attachmentbodybase64.length);
+                //console.log(attachmentbodybase64);
+                //if(attachmentbodybase64.length > 20000000 )
+                    // alert("File size is too large to handle");
+                //else
+                    // {
+                        var fileContents = reader.result;
+                        var base64Mark = 'base64,';
+                        var dataStart = fileContents.indexOf(base64Mark) + base64Mark.length;
+                        fileContents = fileContents.substring(dataStart);
+                        callback(null, fileContents);
+            
+                        //}
+                }
+            reader.readAsDataURL(file);
+        }
+        
+              </script>
+        
+        <script  type="text/javascript">
+        $j = jQuery.noConflict();
+        function waitCloseFunction2() {
+            setTimeout("unBackgroundUI1()",1000);
+        }
+        function unBackgroundUI1() {
+            $j.unblockUI();
+        }
+        function waitFunction(){
+            
+            $j.blockUI({ 
+                message: '<img src="{!$Resource.Spinner}" width="70px" height="70px" />',
+                css: {
+                    border: 'none',
+                    backgroundColor: 'transparent'
+                }
+            }); 
+            // return false;
+        }
+            var totalfilesize=0;
+            var globalCount = 0; 
+            //binds to onchange event of your input field
+            $('#HTMLfiles').bind('change', function() {
+                                    
+                var HTMLF = document.getElementById('HTMLfiles');
+                                                console.log('HTMLF : ' + HTMLF.files.length);
+                                                var count = HTMLF.files.length;
+                                                globalCount = count;
+                                                if(count>0)
+                                                {
+                                                    
+                                                        for (var i = 0; i < HTMLF.files.length; i++) {
+                                                            totalfilesize+=this.files[i].size;
+                                                        }
+                                                    }
+                                                
+                //this.files[0].size gets the size of your file.
+                //alert(this.files[0].size);
+                
+            });
+        </script>
+    </html>
+    
+</apex:page>

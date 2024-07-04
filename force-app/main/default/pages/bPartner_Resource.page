@@ -1,0 +1,352 @@
+<apex:page controller="bPartner_HomePageController" lightningStylesheets="false" standardStylesheets="false" showHeader="false" sidebar="false">
+    <apex:form >
+        <style>
+            .navbar-expand-md .navbar-nav{
+            align-items: center;
+            }
+            
+            #ch {
+            height: 31rem;
+            }
+        </style>
+        <!-- <!doctype html> -->
+        <html lang="en">
+            <head>
+                <title>Bizcap Resources </title><!-- Bootstrap core CSS -->
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+                <meta name="description" content="" />
+                <meta name="author" content="" />
+                <meta name="generator" content="" />
+                
+                <!-- Custom styles for this template -->
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/bootstrap.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/custom.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font/font.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/font-awesome/font-awesome.min.css')}" />
+                <apex:stylesheet value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/css/owl.theme.default.min.css')}" />
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600;700;800;900&display=swap" rel="stylesheet" />
+                <!--font-family: 'Montserrat', sans-serif;-->
+                
+                
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/jquery.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/bootstrap.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/js/popper.min.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/chartjs.init.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/Chart.js/Chart.min.js')}"/>
+                
+                
+            </head>
+            <body id="top-body">
+                <apex:variable var="docVic" value="{!$Label.bPartner_Vic_Partner_pdf}"/>
+                <apex:variable var="docCIC" value="{!$Label.bPartner_Customer_I_Pdf}"/>
+                <apex:variable var="docCS" value="{!$Label.bPartner_Cheat_Sheet_pdf}"/>
+                <apex:variable var="docENG" value="{!$Label.bPartner_Engage_pdf}"/>
+                <apex:variable var="docEFY" value="{!$Label.bPartner}"/>
+                <apex:variable var="docCOV" value="{!$Label.bPartner_Partner_Update}"/>
+                <header class="navbar-dark fixed-top">
+                    <div class="mian-header">
+                        <div class="container">
+                            <div class="row ">
+                                <nav class="navbar navbar-expand-md justify-content-between header-plain ">
+                                    <div class="navbar-brand">
+                                        <a class="" href="{!$Label.bPartner_HomeURL}" target="_top">
+                                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/logo.png')}"/>
+                                            <!--<img src="dist/images/logo.png" />-->
+                                        </a>
+                                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="collapse navbar-collapse ml-auto" id="navbarCollapse">
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item ">
+                                                <a class="nav-link" href="{!$Label.bPartner_HomeURL}" target="_top">Home</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_DealsURL}" target="_top">Deals</a>
+                                                <!--<a class="nav-link" href="about.html">Deals</a>-->
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{!$Label.bPartner_ResourceURL}" target="_top">Resources</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <apex:outputText styleClass="fa fa-phone" />
+                                                <span>1300 922 233</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="haedrcntnumber  ml-auto">
+                                        <ul>
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-user" aria-hidden="true"></i> 
+                                                    <span>{!currentuser.Name}</span>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    <!--<apex:commandLink Styleclass="dropdown-item" value="Dashboard"/>-->
+                                                    <a class="dropdown-item" href="{!$Label.bPartner_ProfileURL}{!currentuser.Id}" target="_top">My Profile</a>
+                                                    <!--<apex:commandLink action="{!loginout}" Styleclass="dropdown-item" value="Log Out"/>-->
+                                                    <a class="dropdown-item"><apex:outputLabel onclick="logoutuser();"> Logout </apex:outputLabel> </a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <main role="main" class="main-part">
+                    
+                    <section class="banner-part page-section relative">
+                        <div class="banner-img">
+                            <apex:image url="{!URLFOR($Resource.bPartnerCSS, 'bPartnerCSS/images/resources-header.jpg')}"/>
+                            <div class="banner-left-text ">
+                                <div class="banner-text-inner text-left text-white">
+                                    <h3>Blog | Partner Files</h3>
+                                    <p>Want to learn about Bizcap, our<br/>products, or our SME customers?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="blog-main-botom">
+                        <div class="container">
+                            <div class="row">
+                                <div class="extrablogs">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal2, 'NewImagesPartnertPortal2/Image14.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Finnies 2021 – Bizcap Makes it to the Finalist Group!</a></h3>
+                                                    <span class="blgdt">May 12, 2021</span>
+                                                    <p style="height: 110px; overflow-y: scroll;">This past year has been nothing short of absolutely crazy but at the heart of it all lies the spirit of being persistent, celebrating our victories and striving to become better at what we do!
+                                                        In that same spirit, we are so thrilled to have made it in the finalist group for a FinTech Australia award this year! It is an absolute honour and pleasure to be sharing this space with so many other great companies and this is a testament to the entire Bizcap team, our partners and our wonderful customers, so a big thank you to you all!</p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 1.2rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal2, 'NewImagesPartnertPortal2/Image13.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Bizcap invests in relationships</a></h3>
+                                                    <span class="blgdt">April 21, 2021</span>
+                                                    <p>Bizcap has made a raft of appointments to strengthen its partnerships team, as the business lender aims to become the solution of choice for finance brokers, mortgage brokers, insurance brokers, accountants and other professionals whose clients need financial assistance.</p>
+                                                    <div class="text-center">
+                                                        <apex:outputLink value="https://www.bizcap.com.au/partner/bizcap-invests-in-relationships/" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 1.3rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal2, 'NewImagesPartnertPortal2/Image9.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">How and when Bizcap can help your clients</a></h3>
+                                                    <span class="blgdt">January 10, 2021</span>
+                                                    <p>As a broker, it’s important to have options up your sleeve – your clients need expert advice, and they’re relying on you to know who can help them in a timely fashion. Here’s how Bizcap can help.</p>
+                                                    <div class="text-center">
+                                                        <apex:outputLink value="https://www.bizcap.com.au/partner/how-and-when-bizcap-can-help-your-clients/" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 2.9rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="extrablogs">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image2.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Solving the small business cash flow challenges</a></h3>
+                                                    <span class="blgdt">November 23, 2020</span>
+                                                    <p>A strong and consistent cash flow is critical for any organisation. However, for small businesses, it’s the thing that can make or break you. </p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 5.2rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image3.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Strutting your stuff – Customer Insights</a></h3>
+                                                    <span class="blgdt">October 26, 2020</span>
+                                                    <p>When opportunities come along in business you sometimes just have to seize them, as Maxine Dosen of Brisbane retailer Strutt Fashion knows only too well.</p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 4rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image4.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">7 Reasons why you may have been rejected for a Business Loan</a></h3>
+                                                    <span class="blgdt">October 1, 2020</span>
+                                                    <p>Securing non-asset backed financial assistance from lenders can be difficult, below we outline seven common reasons you may have been rejected for a business loan in the past, along with what makes Bizcap different to the others and how we can help:</p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 1.1rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="extrablogs">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image6.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Bizcap Customer Insights: Funding Retail</a></h3>
+                                                    <span class="blgdt">August 17, 2020</span>
+                                                    <p>With the help of Bizcap, Perform Bikes has increased their average monthly turnover from $52,000 to $95,000 in just a few months.</p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 2.8rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image7.png')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Bizcap Customer Insights: Funding Construction</a></h3>
+                                                    <span class="blgdt">July 28, 2020</span>
+                                                    <p>With the help of Bizcap, Julius has grown his revenue from $35k in October 2019 to $250k in June 2020. </p>
+                                                    <div class="text-center">
+                                                        <!--<a href="/servlet/servlet.FileDownload?file={!$Label.bPartner_PdfDoc}" class="btn btn-border mt-3 mb-2">Download</a>-->
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 3.2rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="card p-2" id="ch">
+                                                <apex:commandLink onclick="window.open('{!$Label.bPartner_ResourceDetailsURL}'); return false;">
+                                                    <apex:image url="{!URLFOR($Resource.NewImagesPartnertPortal, 'NewImagesPartnertPortal/Image8.jpeg')}" styleClass="img-responsive"/>
+                                                </apex:commandLink>
+                                                <div class="blginer-txt">
+                                                    <h3><a href="resources-details.html">Curious about a loan to help with Cashflow?</a></h3>
+                                                    <span class="blgdt">June 18, 2020</span>
+                                                    <p>Getting your cash flow right is the lifeline of your business</p>
+                                                    <div class="text-center">
+                                                        <apex:outputLink value="{!$Label.bPartner_ResourceDetailsURL}" target="_blank" styleClass="btn btn-border mt-3 mb-2" style="margin-top: 6.8rem !important;">Learn More</apex:outputLink>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+                <footer class="footer-main">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-3 ft ft-one">
+                                <h4 class="font-20 font-weight-bold ft-title">Useful Link</h4>
+                                <ul>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_HowItWorks}'); return false;" value="How It Works"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_AboutUs}'); return false;" value="About us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_PartnerUp}'); return false;" value="Partner Up"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_News}'); return false;" value="News"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ContactUs}'); return false;" value="Contact us"/></li>
+                                    <li><apex:commandLink onclick="window.open('{!$Label.bPartner_ApplyNow}'); return false;" value="Apply Now"/></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-two">
+                                <h4 class="font-20 font-weight-bold ft-title">Location</h4>
+                                <p>Suite 4, 322 St Kilda<br/>Rd, St Kilda VIC 3182</p>
+                            </div>
+                            <div class="col-sm-3 ft ft-three">
+                                <h4 class="font-20 font-weight-bold ft-title">Get in Contact</h4>
+                                <ul>
+                                    <li><i class="fa fa-envelope-o" aria-hidden="true"></i> <a href="mailto:info@bizcap.com.au">info@bizcap.com.au</a></li>
+                                    <li><i class="fa fa-phone" aria-hidden="true"></i> <a href="tel:1300922233">1300-922-233</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-3 ft ft-five">
+                                <h4 class="font-20 font-weight-bold ft-title">Other</h4>
+                                <p>Copyright Zweb Ventures<br/>
+                                    PTY LTD (625 682 831) and <br/>
+                                    Bizcap AU Pty Ltd (54 633 927 <br/>
+                                    090) of PO Box 195, Balaclava<br/>
+                                    VIC 3183</p>
+                                <ul>
+                                    <li>
+                                        <apex:commandLink onclick="window.open('{!$Label.bPartner_Privacy_Policy}'); return false;" value="Privacy Policy"/>
+                                    </li>
+                                    <li>
+                                        <apex:commandLink onclick="window.open('{!$Label.bPartner_Terms_Of_Use}'); return false;" value="Terms of Use"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ft-bottom">
+                        <div class="container">
+                            <div class="row text-center">
+                                <h3>Connect with us:</h3>
+                                <div class="ft-social">
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_Facebook_URL}'); return false;" styleClass="fa fa-facebook"/>
+                                    <apex:commandLink onclick="window.open('{!$Label.bPartner_LinkedIn_URL}'); return false;" styleClass="fa fa-linkedin"/>
+                                    
+                                    <!--<a href="#;"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+<a href="#;"><i class="fa fa-linkedin" aria-hidden="true"></i></a>-->
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </body>
+            
+            <script>
+            function logoutuser()
+            {
+                var lout = '$A.get($Label.c.bPartner_LogOutURL)';
+                window.location.replace("{!$Site.Prefix}/secur/logout.jsp?retUrl=lout");
+            }
+            </script>
+        </html>
+    </apex:form>
+</apex:page>
